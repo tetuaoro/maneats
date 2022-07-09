@@ -1,11 +1,11 @@
-const url = "https://maneats.rao-nagos.pf"
+const url = process.env.BASEURL || ""
 
 /** @type {import('next-sitemap').IConfig} */
 const config = {
   siteUrl: url,
   generateRobotsTxt: true,
   changefreq: "monthly",
-  exclude: ["/dashboard"/* , "/produits/sitemap.xml" */],
+  exclude: ["/dashboard" /* , "/produits/sitemap.xml" */],
   transform: async (_config, path) => {
     const n = path.split("/").filter((f) => f.length > 0)
     return {
