@@ -1,11 +1,11 @@
-const url = "https://jblt.rao-nagos.pf"
+const url = "https://maneats.rao-nagos.pf"
 
 /** @type {import('next-sitemap').IConfig} */
 const config = {
   siteUrl: url,
   generateRobotsTxt: true,
   changefreq: "monthly",
-  exclude: ["/panier", "/produits/sitemap.xml"],
+  exclude: ["/dashboard"/* , "/produits/sitemap.xml" */],
   transform: async (_config, path) => {
     const n = path.split("/").filter((f) => f.length > 0)
     return {
@@ -19,10 +19,10 @@ const config = {
       {
         userAgent: "*",
         allow: "/",
-        disallow: "/panier",
+        disallow: "/dashboard",
       },
     ],
-    additionalSitemaps: [url + "/produits/sitemap.xml"],
+    // additionalSitemaps: [url + "/produits/sitemap.xml"],
   },
 }
 

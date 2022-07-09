@@ -1,3 +1,19 @@
+@font-face {
+  font-family: Conthrax;
+  src: url("/fonts/conthrax-sb.ttf");
+  font-display: swap;
+}
+
+.conthrax {
+  font-family: Conthrax;
+}
+
+.nav-link,
+h1,
+h2 {
+  font-family: Conthrax;
+}
+
 html,
 body {
   padding: 0;
