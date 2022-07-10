@@ -28,3 +28,24 @@ body {
 .navbar-toggler:focus {
   box-shadow: unset;
 }
+
+.navbar-toggler:not(.collapsed) .bar:first-child {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.navbar-toggler:not(.collapsed) .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggler:not(.collapsed) .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.navbar-toggler .bar {
+  display: block;
+  width: 25px;
+  height: 2px;
+  margin: 5px auto;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--bs-light);
+}
