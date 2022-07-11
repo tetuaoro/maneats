@@ -1,4 +1,4 @@
-.card {
+.transition_opacity_y_scale {
   opacity: 0;
   transform: scale(0);
   transition: opacity 0.5s ease 0.3s;

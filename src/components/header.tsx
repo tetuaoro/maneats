@@ -4,12 +4,11 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Container, Nav, Navbar } from "react-bootstrap"
 import { generateArray } from "@utils/functions"
-
-import logo from "@images/logo.png"
-import couverture from "@images/couverture.png"
+import { email, fbId, sitename, telephone } from "@utils/siteinfos"
 
 import Style from "@styles/Header.module.css"
-import { email, fbId, telephone } from "@utils/siteinfos"
+import logo from "@images/logo.png"
+import couverture from "@images/couverture.png"
 
 const Header = () => {
   const coverPictureRef = useRef<HTMLElement>(null)
@@ -72,7 +71,7 @@ const Header = () => {
         <Container fluid>
           <Link href="/">
             <Navbar.Brand href="/">
-              <Image priority alt="Logo de Manea Tahiti Services" src={logo} width={60} height={60} />
+              <Image priority alt={`Logo de ${sitename}`} src={logo} width={60} height={60} />
             </Navbar.Brand>
           </Link>
           <Navbar.Toggle aria-controls="responsive-navbar">
@@ -117,7 +116,7 @@ const Header = () => {
       </Navbar>
       {pathname == "/" && (
         <section ref={coverPictureRef} className={`d-flex justify-content-center bg-black ${Style.transition0}`}>
-          <Image priority alt="Image de couverture de Manea Tahiti Services" src={couverture} />
+          <Image priority alt={`Image de couverture de ${sitename}`} src={couverture} />
         </section>
       )}
     </header>

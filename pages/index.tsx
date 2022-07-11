@@ -1,21 +1,17 @@
-import { NextPage } from "next"
+import type { NextPage } from "next"
 import Head from "next/head"
-import { useRouter } from "next/router"
 import Image from "next/image"
-import { useEffect, useRef } from "react"
-import { Row, Col, Card } from "react-bootstrap"
-import { description, sitename, siteurl } from "@utils/siteinfos"
+import { useEffect } from "react"
+import { Row, Col } from "react-bootstrap"
+import { description, fbAppId, sitename, siteurl } from "@utils/siteinfos"
 import Organization from "@utils/schema"
 
 import HomeCss from "@styles/Home.module.css"
-
-import example from "@images/example.svg"
-import around from "@images/around.png"
+import image1 from "@images/card_1.png"
 
 const Page: NextPage = () => {
   const handleCardObserver = (e: IntersectionObserverEntry[]) => {
     e.forEach((element) => {
-      console.log(element)
       if (element.isIntersecting) {
         const target = element.target as HTMLElement
         target.style.opacity = "1"
@@ -26,7 +22,7 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleCardObserver)
-    document.querySelectorAll(".card").forEach((element) => observer.observe(element))
+    document.querySelectorAll(".observer").forEach((element) => observer.observe(element))
     return () => {
       observer.disconnect()
     }
@@ -37,7 +33,7 @@ const Page: NextPage = () => {
       <Head>
         <title>{sitename}</title>
         <meta name="description" content={description} />
-        <meta property="fb:app_id" content="" />
+        <meta property="fb:app_id" content={`${fbAppId}`} />
         <meta property="og:url" content={siteurl} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={sitename} />
@@ -57,58 +53,138 @@ const Page: NextPage = () => {
         recusandae sapiente placeat adipisci facilis quibusdam atque iusto necessitatibus illum aliquam temporibus minima reiciendis praesentium nisi corrupti molestiae veritatis, modi dignissimos qui
         beatae quo. Beatae earum totam quos facilis?
       </p>
-      <Row className="pt-5">
-        <Col sm={6}></Col>
-        <Col>
-          <Card as="article" className={`${HomeCss.card} border-0`}>
-            <Card.Title as="h2">Livraisons</Card.Title>
-            <Image src={around} alt="Livraison à Tahiti et dans les îles" />
-            <Card.Text>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Reprehenderit necessitatibus impedit eveniet veniam voluptates minus maiores aut delectus quod? Eum tempore sunt rem debitis.
-              Vero sit tempore laudantium eum quidem?
-            </Card.Text>
-          </Card>
-        </Col>
-      </Row>
-      <Row className="pt-5">
-        <Col sm={6}>
-          <Card as="article" className={`${HomeCss.card} border-0`}>
-            <Card.Title as="h2">{"Déplacement"}</Card.Title>
-            <Image src={example} alt="Example sample" />
-            <Card.Text>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Reprehenderit necessitatibus impedit eveniet veniam voluptates minus maiores aut delectus quod? Eum tempore sunt rem debitis.
-              Vero sit tempore laudantium eum quidem?
-            </Card.Text>
-          </Card>
-        </Col>
-        <Col></Col>
-      </Row>
-      <Row className="pt-5">
-        <Col sm={6}></Col>
-        <Col>
-          <Card as="article" className={`${HomeCss.card} border-0`}>
-            <Card.Title as="h2">Courses</Card.Title>
-            <Image src={around} alt="Livraison à Tahiti et dans les îles" />
-            <Card.Text>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Reprehenderit necessitatibus impedit eveniet veniam voluptates minus maiores aut delectus quod? Eum tempore sunt rem debitis.
-              Vero sit tempore laudantium eum quidem?
-            </Card.Text>
-          </Card>
-        </Col>
-      </Row>
-      <Row className="pt-5">
-        <Col sm={6}>
-          <Card as="article" className={`${HomeCss.card} border-0`}>
-            <Card.Title as="h2">{"À Tahiti et dans les îles"}</Card.Title>
-            <Image src={example} alt="Example sample" />
-            <Card.Text>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Reprehenderit necessitatibus impedit eveniet veniam voluptates minus maiores aut delectus quod? Eum tempore sunt rem debitis.
-              Vero sit tempore laudantium eum quidem?
-            </Card.Text>
-          </Card>
-        </Col>
-        <Col></Col>
-      </Row>
+      <div className="d-none d-sm-block">
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem1">
+                <a href="#lorem1">Lorem 1</a>
+              </h2>
+              <p>
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Omnis obcaecati error iure repellat quam dignissimos tenetur quod facilis. Possimus eius id maxime nesciunt voluptates, nulla
+                ratione laboriosam. Iste, non possimus!
+              </p>
+            </article>
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem2">
+                <a href="#lorem2">Lorem 2</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam facere fugit, magni quae inventore, reprehenderit voluptatibus ducimus magnam voluptas rerum velit. Earum tempora
+                neque cumque explicabo facere eaque voluptates vero!
+              </p>
+            </article>
+          </Col>
+          <Col>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem3">
+                <a href="#lorem3">Lorem 3</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime reprehenderit, eum, mollitia, dolorum dolore doloremque unde nisi optio aut magnam eius! Voluptatum quisquam error
+                harum cum labore! Deleniti, esse eveniet.
+              </p>
+            </article>
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem4">
+                <a href="#lorem4">Lorem 4</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, nulla beatae ratione vero quidem quasi minus officia cumque esse consequuntur quam odit modi neque aperiam
+                corporis. Obcaecati assumenda dolorem nisi.
+              </p>
+            </article>
+          </Col>
+          <Col>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+        </Row>
+      </div>
+      <div className="d-sm-none">
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem1">
+                <a href="#lorem1">Lorem 1</a>
+              </h2>
+              <p>
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Omnis obcaecati error iure repellat quam dignissimos tenetur quod facilis. Possimus eius id maxime nesciunt voluptates, nulla
+                ratione laboriosam. Iste, non possimus!
+              </p>
+            </article>
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem2">
+                <a href="#lorem2">Lorem 2</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam facere fugit, magni quae inventore, reprehenderit voluptatibus ducimus magnam voluptas rerum velit. Earum tempora
+                neque cumque explicabo facere eaque voluptates vero!
+              </p>
+            </article>
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem3">
+                <a href="#lorem3">Lorem 3</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime reprehenderit, eum, mollitia, dolorum dolore doloremque unde nisi optio aut magnam eius! Voluptatum quisquam error
+                harum cum labore! Deleniti, esse eveniet.
+              </p>
+            </article>
+          </Col>
+        </Row>
+        <Row className="pt-5">
+          <Col sm={6}>
+            <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
+          </Col>
+          <Col>
+            <article className="d-flex flex-column justify-content-center h-100">
+              <h2 id="lorem4">
+                <a href="#lorem4">Lorem 4</a>
+              </h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, nulla beatae ratione vero quidem quasi minus officia cumque esse consequuntur quam odit modi neque aperiam
+                corporis. Obcaecati assumenda dolorem nisi.
+              </p>
+            </article>
+          </Col>
+        </Row>
+      </div>
     </main>
   )
 }

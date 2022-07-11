@@ -6,8 +6,8 @@ export default function Document() {
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon image_src" href="/apple-touch-icon.png" />
-        {/* <link rel="preload" href="/images/lo_be.png" as="image" />
-        <link rel="preload" href="/fonts/Poppins-Medium.ttf" as="font" type="font/ttf" crossOrigin="" /> */}
+        <link rel="preload" href="/images/motif.png" as="image" />
+        <link rel="preload" href="/fonts/conthrax-sb.ttf" as="font" type="font/ttf" crossOrigin="" />
       </Head>
       <body>
         <Main />

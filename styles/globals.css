@@ -8,7 +8,7 @@
   font-family: Conthrax;
 }
 
-.nav-link,
+.navbar .nav-link,
 h1,
 h2 {
   font-family: Conthrax;
@@ -19,6 +19,68 @@ body {
   padding: 0;
   margin: 0;
 }
+
+/* FOOTER */
+
+footer {
+  position: relative;
+}
+
+footer::before {
+  position: absolute;
+  content: "";
+  background-image: url("/images/motif.png");
+  min-height: 103px;
+  width: 100%;
+  opacity: 0.5;
+}
+
+.pt-130 {
+  padding-top: 130px !important;
+}
+
+footer a, footer .nav-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer a:hover, footer .nav-link:hover {
+  color: var(--bs-primary);
+}
+
+.bouncingglobe {
+  position: absolute;
+  animation: bounce 1s;
+  transform: translateY(0px);
+  animation-iteration-count: infinite;
+}
+
+@keyframes bounce {
+  0% {
+    top: 0;
+    animation-timing-function: ease-in;
+  }
+  40% {
+  }
+  50% {
+    top: 14px;
+    animation-timing-function: ease-out;
+  }
+  55% {
+    top: 12px;
+    animation-timing-function: ease-in;
+  }
+  65% {
+    top: 12px;
+    animation-timing-function: ease-out;
+  }
+  100% {
+    top: 0;
+    animation-timing-function: ease-in;
+  }
+}
+
+/* NAVBAR */
 
 .navbar-toggler {
   border-color: unset;
@@ -48,4 +110,15 @@ body {
   margin: 5px auto;
   transition: all 0.3s ease-in-out;
   background-color: var(--bs-light);
+}
+
+.navbar.bg-black .nav-link:not(.active):hover {
+  color: var(--bs-primary);
+}
+
+/* INDEX PAGE */
+
+h2 > a {
+  color: inherit;
+  text-decoration: inherit;
 }
