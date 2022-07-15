@@ -30,22 +30,30 @@ footer::before {
   position: absolute;
   content: "";
   background-image: url("/images/motif_footer_white.svg");
-  background-size: contain;
+  background-size: cover;
   height: 103px;
   width: 100%;
   opacity: 0.5;
+}
+
+@media (min-width: 576px) {
+  footer::before {
+    background-size: contain;
+  }
 }
 
 .pt-130 {
   padding-top: 130px !important;
 }
 
-footer a, footer .nav-link {
+footer a,
+footer .nav-link {
   color: inherit;
   text-decoration: none;
 }
 
-footer a:hover, footer .nav-link:hover {
+footer a:hover,
+footer .nav-link:hover {
   color: var(--bs-primary);
 }
 
