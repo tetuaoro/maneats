@@ -60,7 +60,7 @@ const Page: NextPage = () => {
           <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
         </Col>
         <Col>
-          <article className="d-flex flex-column justify-content-center h-100">
+          <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
             <h2 id="lorem1">
               <a href="#lorem1">Lorem 1</a>
             </h2>
@@ -76,7 +76,7 @@ const Page: NextPage = () => {
           <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
         </Col>
         <Col sm={6}>
-          <article className="d-flex flex-column justify-content-center h-100">
+          <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
             <h2 id="lorem2">
               <a href="#lorem2">Lorem 2</a>
             </h2>
@@ -92,7 +92,7 @@ const Page: NextPage = () => {
           <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
         </Col>
         <Col>
-          <article className="d-flex flex-column justify-content-center h-100">
+          <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
             <h2 id="lorem3">
               <a href="#lorem3">Lorem 3</a>
             </h2>
@@ -108,7 +108,7 @@ const Page: NextPage = () => {
           <Image className={`observer ${HomeCss.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
         </Col>
         <Col sm={6}>
-          <article className="d-flex flex-column justify-content-center h-100">
+          <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
             <h2 id="lorem4">
               <a href="#lorem4">Lorem 4</a>
             </h2>

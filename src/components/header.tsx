@@ -90,9 +90,6 @@ const Header = () => {
               <Nav.Item as="li" className="me-md-3">
                 <NavLink href="/tarifs" name="TARIFS" />
               </Nav.Item>
-              <Nav.Item as="li" className="me-md-3">
-                <NavLink href="/contact" name="CONTACT" />
-              </Nav.Item>
             </Nav>
             <Navbar.Text as="section" className="d-flex justify-content-center me-sm-5">
               <a className="me-4" href={`tel:${telephone}`}>

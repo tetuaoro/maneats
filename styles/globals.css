@@ -8,16 +8,21 @@
   font-family: Conthrax;
 }
 
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
 .navbar .nav-link,
 h1,
 h2 {
   font-family: Conthrax;
 }
 
-html,
-body {
-  padding: 0;
-  margin: 0;
+h2 > a {
+  color: inherit;
+  text-decoration: inherit;
 }
 
 /* FOOTER */
@@ -125,9 +130,14 @@ footer .nav-link:hover {
   color: var(--bs-primary);
 }
 
-/* INDEX PAGE */
+/* TARIFS PAGE */
 
-h2 > a {
-  color: inherit;
-  text-decoration: inherit;
+.table-bordered th:first-child,
+.table-bordered td:first-child {
+  border-width: 0 1px 0 0 !important;
+}
+
+.table-bordered th:last-child,
+.table-bordered td:last-child {
+  border-width: 0 0 0 1px !important;
 }

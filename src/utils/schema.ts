@@ -3,25 +3,25 @@ import { sitename, siteurl, telephone, description, sameAs } from "./siteinfos"
 
 const address: PostalAddress = {
   "@type": "PostalAddress",
-  addressLocality: "Puna'auia",
-  postalCode: "98718",
-  streetAddress: "Puna'auia, Polynésie française",
+  addressLocality: "Papeete",
+  postalCode: "98713",
+  streetAddress: "Papeete, Polynésie française",
   addressCountry: "PF",
-  addressRegion: "Puna'auia",
+  addressRegion: "Papeete",
 }
 
 const openingHoursSpecification: OpeningHoursSpecification = {
   "@type": "OpeningHoursSpecification",
   dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-  opens: "06:30:00",
-  closes: "15:30:00",
+  opens: "06:00:00",
+  closes: "16:00:00",
 }
 
 const aggregateRating: AggregateRating = {
   "@type": "AggregateRating",
   ratingValue: 4,
   bestRating: 5,
-  ratingCount: 3,
+  ratingCount: 1,
 }
 
 const organization: WithContext<LocalBusiness> = {
@@ -33,7 +33,7 @@ const organization: WithContext<LocalBusiness> = {
   sameAs,
   description,
   url: siteurl,
-  logo: `${siteurl}/images/logo.png`,
+  logo: `${siteurl}/android_chrome_x144.png`,
   name: sitename,
   image: [`${siteurl}/images/couverture.png`],
   priceRange: "€€€",

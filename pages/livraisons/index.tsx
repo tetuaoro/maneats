@@ -7,7 +7,7 @@ const description = `Réserver vos livraisons directement en ligne avec ${sitena
 
 const Page: NextPage = () => {
   return (
-    <main className="container pt-3 pt-sm-5">
+    <main className="container pt-5">
       <Head>
         <meta name="description" content={description} />
         <title>{title}</title>
