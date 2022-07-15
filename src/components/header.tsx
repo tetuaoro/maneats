@@ -7,7 +7,7 @@ import { generateArray } from "@utils/functions"
 import { email, fbId, sitename, telephone } from "@utils/siteinfos"
 
 import Style from "@styles/Header.module.css"
-import logo from "@images/logo.png"
+import logo from "@images/logo_shape_white.svg"
 import couverture from "@images/couverture.png"
 
 const Header = () => {

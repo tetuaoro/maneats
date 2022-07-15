@@ -29,8 +29,9 @@ footer {
 footer::before {
   position: absolute;
   content: "";
-  background-image: url("/images/motif.png");
-  min-height: 103px;
+  background-image: url("/images/motif_footer_white.svg");
+  background-size: contain;
+  height: 103px;
   width: 100%;
   opacity: 0.5;
 }
