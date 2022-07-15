@@ -9,6 +9,8 @@ import Organization from "@utils/schema"
 import HomeCss from "@styles/Home.module.css"
 import image1 from "@images/delivery_tahiti.webp"
 
+const title = sitename + " - Le coursier de Tahiti et ses îles"
+
 const Page: NextPage = () => {
   const handleCardObserver = (e: IntersectionObserverEntry[]) => {
     e.forEach((element) => {
@@ -31,7 +33,7 @@ const Page: NextPage = () => {
   return (
     <main className="container pt-5">
       <Head>
-        <title>{sitename}</title>
+        <title>{title}</title>
         <meta name="description" content={description} />
         <meta property="fb:app_id" content={`${fbAppId}`} />
         <meta property="og:url" content={siteurl} />
