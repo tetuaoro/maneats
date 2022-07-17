@@ -34,8 +34,7 @@ footer {
 footer::before {
   position: absolute;
   content: "";
-  background-image: url("/images/motif_footer_white.svg");
-  background-size: cover;
+  background-image: url("/images/motif_white_103.png");
   height: 103px;
   width: 100%;
   opacity: 0.5;

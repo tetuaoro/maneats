@@ -18,11 +18,12 @@ const Page: NextPage = () => {
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat qui aperiam neque nostrum voluptatibus dignissimos vitae voluptate? Amet veniam consequuntur ducimus est error? Eius maiores
         culpa quam. Labore, quasi cumque.
       </p>
-      <h2 className="mt-5">Tahiti - de Papara à Papenoo</h2>
-      <Table bordered hover>
+      <h2 className="mt-5">Tahiti</h2>
+      <Table bordered hover responsive="sm">
+        <caption>La livraison est couverte de Papara à Papenoo</caption>
         <thead>
           <tr>
-            <th>Secteur</th>
+            <th>Secteur de livraison</th>
             <th>
               Volume au m<sup>3</sup>
             </th>
@@ -88,10 +89,10 @@ const Page: NextPage = () => {
         </tbody>
       </Table>
       <h2 className="mt-5">Dans les îles</h2>
-      <Table bordered hover>
+      <Table bordered hover responsive="sm">
         <thead>
           <tr>
-            <th>Secteur</th>
+            <th>Secteur de livraison</th>
             <th>
               Volume au m<sup>3</sup>
             </th>

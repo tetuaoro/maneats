@@ -7,7 +7,7 @@ import { description, fbAppId, sitename, siteurl } from "@utils/siteinfos"
 import Organization from "@utils/schema"
 
 import HomeCss from "@styles/Home.module.css"
-import image1 from "@images/delivery_tahiti.webp"
+import image1 from "@images/delivery_tahiti.png"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
