@@ -12,6 +12,16 @@ svg.align-text-sub {
   vertical-align: sub;
 }
 
+.text-indent {
+  text-indent: 1.5rem;
+}
+
+@media (min-width: 576px) {
+  .text-indent {
+    text-indent: 2rem;
+  }
+}
+
 html,
 body {
   padding: 0;
@@ -100,6 +110,11 @@ footer .nav-link:hover {
 }
 
 /* NAVBAR */
+
+.link-addr:hover {
+  color: var(--bs-primary);
+  transition: color 0.2s ease;
+}
 
 .navbar-toggler {
   border-color: unset;

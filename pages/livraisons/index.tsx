@@ -1,6 +1,6 @@
 import type { NextPage } from "next"
 import Head from "next/head"
-import { sitename } from "@utils/siteinfos"
+import { sitename } from "@libs/siteinfos"
 
 const title = sitename + " | Livraisons"
 const description = `Réserver vos livraisons directement en ligne avec ${sitename}, depuis Tahiti ou depuis les îles.`
