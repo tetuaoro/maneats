@@ -65,7 +65,7 @@ const Page: NextPage = () => {
         de livraison locaux, donc si vous cherchez quelqu'un qui peut ramasser vos courses au magasin ou les livrer directement à votre porte depuis Tahiti ou dans les îles, nous avons ce qu'il faut !
       `}
       </p>
-      <h2 className="pt-3">Nous vous proposons :</h2>
+      <h2 className="pt-3">Nos propositions :</h2>
       <Row className="pt-5">
         <Col sm={6}>
           <Image className={`observer ${styles.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
