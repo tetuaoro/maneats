@@ -8,6 +8,10 @@
   font-family: Conthrax;
 }
 
+svg.align-text-sub {
+  vertical-align: sub;
+}
+
 html,
 body {
   padding: 0;
@@ -16,11 +20,13 @@ body {
 
 .navbar .nav-link,
 h1,
-h2 {
+h2,
+h3 {
   font-family: Conthrax;
 }
 
-h2 > a {
+h2 > a,
+h3 > a {
   color: inherit;
   text-decoration: inherit;
 }

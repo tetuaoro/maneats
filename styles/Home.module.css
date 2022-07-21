@@ -4,3 +4,7 @@
   transition: opacity 0.5s ease 0.3s;
   transition: transform 0.5s ease 0.3s;
 }
+
+.indent {
+  text-indent: 1.5rem;
+}
