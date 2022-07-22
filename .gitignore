@@ -36,3 +36,4 @@ public/sitemap*.xml
 public/sw.js
 public/sw.js.map
 public/workbox*
+public/site.webmanifest

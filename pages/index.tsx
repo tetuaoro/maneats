@@ -2,8 +2,9 @@ import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect } from "react"
+import dynamic from "next/dynamic"
 import { Workbox } from "workbox-window"
+import { useEffect } from "react"
 import { Row, Col } from "react-bootstrap"
 import { description, fbAppId, sitename, siteurl } from "@libs/siteinfos"
 import Organization from "@libs/schema"
@@ -41,8 +42,7 @@ const Page: NextPage = () => {
     const wb = new Workbox("sw.js", { scope: "/" })
     setTimeout(async () => {
       try {
-        const register = await wb.register()
-        console.log(register)
+        await wb.register()
       } catch (error) {
         console.error(error)
       }
