@@ -1,14 +1,15 @@
 import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
+import Link from "next/link"
 import { useEffect } from "react"
+import { Workbox } from "workbox-window"
 import { Row, Col } from "react-bootstrap"
 import { description, fbAppId, sitename, siteurl } from "@libs/siteinfos"
 import Organization from "@libs/schema"
 
 import styles from "@styles/Home.module.css"
 import image1 from "@images/delivery_tahiti.png"
-import Link from "next/link"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -29,6 +30,23 @@ const Page: NextPage = () => {
     return () => {
       observer.disconnect()
     }
+  }, [])
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) {
+      console.warn("Pwa support is disabled")
+      return
+    }
+
+    const wb = new Workbox("sw.js", { scope: "/" })
+    setTimeout(async () => {
+      try {
+        const register = await wb.register()
+        console.log(register)
+      } catch (error) {
+        console.error(error)
+      }
+    }, 3000)
   }, [])
 
   return (

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "gulp purgecss && next-sitemap",
+    "webmanifest": "node site.webmanifest.js",
+    "postbuild": "gulp purgecss && next-sitemap && yarn webmanifest",
     "deploy": "next build && next start"
   },
   "dependencies": {
