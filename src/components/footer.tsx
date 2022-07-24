@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Container, Nav } from "react-bootstrap"
-import { email, fbId, raoLink, sitename, telephone } from "@libs/siteinfos"
+import { email, fbId, raoLink, sitename, telephone } from "@libs/app"
 
 const Footer = () => {
   const [isMobile, setDevice] = useState(false)

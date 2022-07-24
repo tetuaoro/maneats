@@ -1,4 +1,5 @@
-const siteurl = process.env.NEXT_PUBLIC_BASEURL || ""
+// clientSide or serverSide
+const siteurl = process.env.NEXT_PUBLIC_BASEURL || process.env.BASEURL || ""
 const sitename = "Manea tahiti services"
 const description = "Entreprise proposant ses services de coursier et de livraison à domicile, à Tahiti et dans les îles."
 const telephone = "+68987201801"
@@ -10,4 +11,6 @@ const fbAppId = "1089325565354845"
 
 const raoLink = "http://www.rao-nagos.pf"
 
-export { description, sitename, siteurl, telephone, sameAs, fbId, email, fbAppId, raoLink }
+const pwaId = "maneats15072022"
+
+export { description, sitename, pwaId, siteurl, telephone, sameAs, fbId, email, fbAppId, raoLink }

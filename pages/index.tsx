@@ -2,11 +2,10 @@ import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
 import Link from "next/link"
-import dynamic from "next/dynamic"
 import { Workbox } from "workbox-window"
 import { useEffect } from "react"
 import { Row, Col } from "react-bootstrap"
-import { description, fbAppId, sitename, siteurl } from "@libs/siteinfos"
+import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 
 import styles from "@styles/Home.module.css"
@@ -46,7 +45,7 @@ const Page: NextPage = () => {
       } catch (error) {
         console.error(error)
       }
-    }, 3000)
+    }, 11000)
   }, [])
 
   return (
@@ -59,7 +58,7 @@ const Page: NextPage = () => {
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={`${siteurl}/images/couverture.png`} />
+        <meta property="og:image" content={`${siteurl}/images/media_cover.png`} />
         <meta property="og:image:alt" content={`Le logo officiel de ${sitename}`} />
         <meta property="og:image:width" content="720" />
         <meta property="og:image:height" content="482" />

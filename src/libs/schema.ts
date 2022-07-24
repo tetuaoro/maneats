@@ -1,5 +1,5 @@
 import { WithContext, PostalAddress, OpeningHoursSpecification, AggregateRating, LocalBusiness } from "schema-dts"
-import { sitename, siteurl, telephone, description, sameAs } from "./siteinfos"
+import { sitename, siteurl, telephone, description, sameAs } from "@libs/app"
 
 const address: PostalAddress = {
   "@type": "PostalAddress",

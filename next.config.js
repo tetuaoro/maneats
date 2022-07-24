@@ -4,17 +4,14 @@ const { InjectManifest } = require("workbox-webpack-plugin")
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
+  poweredByHeader: false,
 }
 
 const withWorkbox = (nextConfig = {}) => {
   return {
     ...nextConfig,
     webpack(config, options) {
-      if (typeof nextConfig.webpack === "function") {
-        config = nextConfig.webpack(config, options)
-      }
-
       const {
         dev,
         isServer,
@@ -32,6 +29,7 @@ const withWorkbox = (nextConfig = {}) => {
 
       const swDestPath = join(options.dir, dest, swDest)
 
+      console.log("> Nextjs configuration lock")
       console.log("> Progressive web app is enabled using Workbox")
       console.log(`> Service worker destination path: "${swDestPath}"`)
 
@@ -55,6 +53,11 @@ const withWorkbox = (nextConfig = {}) => {
       }
 
       console.log("> Progressive web app configuration complete")
+      console.log("> Nextjs configuration unlock")
+      if (typeof nextConfig.webpack === "function") {
+        config = nextConfig.webpack(config, options)
+      }
+
       return config
     },
   }

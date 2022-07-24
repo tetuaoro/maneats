@@ -1,6 +1,6 @@
 import type { NextPage } from "next"
 import Head from "next/head"
-import { sitename } from "@libs/siteinfos"
+import { sitename } from "@libs/app"
 import { Table } from "react-bootstrap"
 
 const title = sitename + " | Tarifs"

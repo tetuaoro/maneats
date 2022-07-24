@@ -1,15 +1,17 @@
 {
   "name": "maneats",
-  "version": "0.2.4",
+  "version": "0.2.4.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "yarn webmanifest && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "webmanifest": "node site.webmanifest.js",
-    "postbuild": "gulp purgecss && next-sitemap && yarn webmanifest",
-    "deploy": "next build && next start"
+    "prebuild": "yarn webmanifest",
+    "postbuild": "gulp purgecss && next-sitemap",
+    "deploy": "next build && next start",
+    "all": "yarn build && yarn start"
   },
   "dependencies": {
     "bootstrap": "^5.1.3",
