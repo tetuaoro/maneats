@@ -1,5 +1,6 @@
 const { writeFileSync } = require("fs")
 
+/** @type {WebManifest} */
 const config = {
   lang: "fr",
   id: "maneats15072022",
@@ -18,6 +19,15 @@ const config = {
   theme_color: "#000000",
   background_color: "#000000",
   display: "standalone",
+  shortcuts: [
+    {
+      name: "Demander un devis",
+      short_name: "Devis",
+      description: "Réaliser un devis afin d'estimer la facture finale.",
+      url: "/tarifs",
+      icons: [{ src: "/icons/file-earmark.png", sizes: "192x192", type: "image/png" }],
+    },
+  ],
 }
 
 writeFileSync("./public/site.webmanifest", JSON.stringify(config))
