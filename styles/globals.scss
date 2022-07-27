@@ -6,12 +6,12 @@ $primary: #d4262f;
 
 $table-hover-bg: rgba($primary, $table-hover-bg-factor);
 
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/utilities";
-
 $colors: map-remove($colors, "blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "cyan");
 $theme-colors: map-remove($theme-colors, "info", "warning", "success", "danger", "secondary");
 
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
 @import "bootstrap/scss/root";
 @import "bootstrap/scss/reboot";
 @import "bootstrap/scss/type";
