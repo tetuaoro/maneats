@@ -11,6 +11,6 @@ const fbAppId = "1089325565354845"
 
 const raoLink = "http://www.rao-nagos.pf"
 
-const pwaId = "maneats15072022"
+const pwaId = "pf.maneatahitiservices.rao-nagos.pwa"
 
 export { description, sitename, pwaId, siteurl, telephone, sameAs, fbId, email, fbAppId, raoLink }

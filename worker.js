@@ -13,7 +13,7 @@ if (Array.isArray(WB_MANIFEST)) {
     const { url } = wbm
     if (url && typeof url === "string") return url.match(/_next\/static/)
   })
-  WB_MANIFEST.push({ url: "/site.webmanifest", revision: null })
+  WB_MANIFEST.push({ url: "/site.webmanifest", revision: Date.now() })
 }
 
 precacheAndRoute(WB_MANIFEST || [])

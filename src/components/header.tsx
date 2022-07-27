@@ -1,22 +1,17 @@
 import Image from "next/image"
 import { useRouter } from "next/router"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { Container, Navbar } from "react-bootstrap"
 import { email, fbId, sitename, telephone } from "@libs/app"
 
 import styles from "@styles/Header.module.css"
 import logo from "@images/logo_shape_white.png"
 import couverture from "@images/couverture.png"
+import { isDeviceMobile } from "@libs/hooks"
 
 const Header = () => {
   const { pathname } = useRouter()
-  const [isMobile, setDevice] = useState(false)
-
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent
-    if (userAgent.match("Android|iPhone|iPad")) setDevice(true)
-  }, [])
+  const [isMobile] = isDeviceMobile()
 
   return (
     <header className={styles.displayUnset}>

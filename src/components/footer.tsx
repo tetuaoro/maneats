@@ -1,18 +1,14 @@
-import { useEffect, useState } from "react"
 import { Container, Nav } from "react-bootstrap"
 import { email, fbId, raoLink, sitename, telephone } from "@libs/app"
+import { isDeviceMobile } from "@libs/hooks"
 
 const Footer = () => {
-  const [isMobile, setDevice] = useState(false)
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent
-    if (userAgent.match("Android|iPhone|iPad")) setDevice(true)
-  }, [])
+  const [isMobile] = isDeviceMobile()
 
   return (
     <footer className="bg-dark border-top border-primary border-5 text-white">
       <Container className="conthrax pt-130 pb-5">
-        <h3 className="h1 mb-0">TEVA</h3>
+        <h2 className="h1 mb-0">TEVA</h2>
         <hr className="border border-primary opacity-100 mt-0" />
         <a href={`tel:${telephone}`}>{telephone}</a>
         <div>

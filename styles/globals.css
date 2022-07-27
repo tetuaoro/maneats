@@ -35,6 +35,12 @@ h3 {
   font-family: Conthrax;
 }
 
+h2 > a:hover::after,
+h3 > a:hover::after {
+  content: "#";
+  color: #aa1e26;
+}
+
 h2 > a,
 h3 > a {
   color: inherit;
