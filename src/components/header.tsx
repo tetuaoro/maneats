@@ -3,11 +3,11 @@ import { useRouter } from "next/router"
 import Link from "next/link"
 import { Container, Navbar } from "react-bootstrap"
 import { email, fbId, sitename, telephone } from "@libs/app"
+import { isDeviceMobile } from "@libs/hooks"
 
 import styles from "@styles/Header.module.css"
 import logo from "@images/logo_shape_white.png"
 import couverture from "@images/couverture.png"
-import { isDeviceMobile } from "@libs/hooks"
 
 const Header = () => {
   const { pathname } = useRouter()

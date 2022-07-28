@@ -41,26 +41,8 @@ const MainLayout = () => {
 }
 
 const Page: NextPage = () => {
-  const handleCardObserver = (e: IntersectionObserverEntry[]) => {
-    e.forEach((element) => {
-      if (element.isIntersecting) {
-        const target = element.target as HTMLElement
-        target.style.opacity = "1"
-        target.style.transform = "scale(1)"
-      }
-    })
-  }
-
   useEffect(() => {
-    const observer = new IntersectionObserver(handleCardObserver)
-    document.querySelectorAll(".observer").forEach((element) => observer.observe(element))
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) {
+    if (!("serviceWorker" in navigator) && process.env.NEXT_PUBLIC_PWA_ENABLED !== "OK") {
       console.warn("Pwa support is disabled")
       return
     }
