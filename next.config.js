@@ -63,6 +63,6 @@ const withWorkbox = (nextConfig = {}) => {
 }
 
 // const development = process.env.NODE_ENV !== "production"
-module.exports = withWorkbox({ ...nextConfig, workbox: { swSrc: "worker.js", force: process.env.PWA_ENABLED === "OK" } })
+module.exports = withWorkbox({ ...nextConfig, workbox: { swSrc: "worker.js", force: process.env.PWA_ENABLED } })
 
 // module.exports = nextConfig

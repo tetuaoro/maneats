@@ -5,8 +5,9 @@ import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 
-import PurposeLayout from "@components/purposes"
+import PurposeLayout from "@components/services"
 import EstimateLayout from "@components/estimates"
+import { logger } from "@libs/functions"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -42,23 +43,34 @@ const MainLayout = () => {
 
 const Page: NextPage = () => {
   useEffect(() => {
-    if (!("serviceWorker" in navigator) && process.env.NEXT_PUBLIC_PWA_ENABLED !== "OK") {
-      console.warn("Pwa support is disabled")
-      return
-    }
+    // if (!("serviceWorker" in navigator) && !process.env.NEXT_PUBLIC_PWA_ENABLED) {
+    //   console.warn("Pwa support is disabled")
+    //   return
+    // }
 
-    const wb = new Workbox("sw.js", { scope: "/" })
-    const id = setTimeout(async () => {
-      try {
-        await wb.register()
-      } catch (error) {
-        console.error(error)
+    const ff = async () => {
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        for (const registration of registrations) {
+          logger("log", "unregister sw", await registration.unregister())
+        }
       }
-    }, 11000)
-
-    return () => {
-      clearTimeout(id)
     }
+
+    ff()
+
+    // const wb = new Workbox("sw.js", { scope: "/" })
+    // const id = setTimeout(async () => {
+    //   try {
+    //     await wb.register()
+    //   } catch (error) {
+    //     console.error(error)
+    //   }
+    // }, 11000)
+
+    // return () => {
+    //   clearTimeout(id)
+    // }
   }, [])
 
   return (
