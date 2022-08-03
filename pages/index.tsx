@@ -14,7 +14,7 @@ const title = sitename + " - Le coursier de Tahiti et ses îles"
 const MainLayout = () => {
   return (
     <>
-      <h1>Ton coursier à domicile</h1>
+      <h1 className="conthrax">Ton coursier à domicile</h1>
 
       <section className="py-3 py-sm-5">
         <p className="text-indent">

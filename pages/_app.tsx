@@ -1,18 +1,21 @@
 import "@styles/globals.scss"
-import "@styles/globals.css"
 import type { AppProps } from "next/app"
 import Header from "@components/header"
 import Footer from "@components/footer"
-
-import { RecoilRoot } from "recoil"
+import { useRouter } from "next/router"
 
 function App({ Component, pageProps }: AppProps) {
+  const { pathname } = useRouter()
+  if (pathname.startsWith("/dashboard")) {
+    return <Component {...pageProps} />
+  }
+
   return (
-    <RecoilRoot>
+    <>
       <Header />
       <Component {...pageProps} />
       <Footer />
-    </RecoilRoot>
+    </>
   )
 }
 

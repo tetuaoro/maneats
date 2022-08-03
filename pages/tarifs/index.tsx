@@ -79,7 +79,7 @@ const Page: NextPage = () => {
         <meta name="description" content={description} />
         <title>{title}</title>
       </Head>
-      <h1>Tarifs</h1>
+      <h1 className="conthrax">Tarifs</h1>
       <p className="text-indent">{"Lorsqu'il s'agit de services de courrier, nous sommes les spécialistes."}</p>
       <p className="text-indent">
         {
@@ -98,7 +98,7 @@ const Page: NextPage = () => {
         }
         <span className="text-primary">doivent être validé par nos soins.</span>
       </p>
-      <h2 id="tahiti" className="mt-5">
+      <h2 id="tahiti" className="conthrax mt-5">
         <a href="#tahiti">Tahiti</a>
       </h2>
       <Table bordered hover responsive="sm">
@@ -129,7 +129,7 @@ const Page: NextPage = () => {
           ))}
         </tbody>
       </Table>
-      <h2 id="iles" className="mt-5">
+      <h2 id="iles" className="conthrax mt-5">
         <a href="#iles">Dans les îles</a>
       </h2>
       <Table bordered hover responsive="sm">

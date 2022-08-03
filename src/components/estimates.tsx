@@ -3,7 +3,7 @@ import MasterForm from "./forms"
 const Component = () => {
   return (
     <>
-      <h2 id="estimation">
+      <h2 id="estimation" className="conthrax">
         <a href="#estimation">Faire une estimation de prix</a>
       </h2>
 

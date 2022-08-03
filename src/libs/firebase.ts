@@ -14,16 +14,34 @@ const firebaseConfigClientSide = {
 const app = initializeApp(firebaseConfigClientSide)
 const db = getFirestore(app)
 
+interface ImageSrc {
+  src: string
+  width: number
+  height: number
+}
 export interface ServiceData {
-  subtitle: string
-  imagesrc: string
+  name: string
+  imagesrc: ImageSrc
   description: string
   creationdate: number
   updatedate?: number
   id?: string
 }
 
+type ContratType = "free" | "premium"
+export interface AccountData {
+  name: string
+  contratType: ContratType
+  organization: string
+  description: string
+  creationdate: number
+  enddate?: number
+  updatedate?: number
+  id?: string
+}
+
 export const SERVICES_REF = "services"
+export const ACCOUNT_REF = "account"
 
 export const getServiceDocs = async () => {
   try {
@@ -33,10 +51,27 @@ export const getServiceDocs = async () => {
     const data: ServiceData[] = []
     docsSnap.forEach((doc) => {
       const docData = doc.data() as ServiceData
-      const normalize = { ...docData, id: doc.id }
-      data.push(normalize)
+      docData["id"] = doc.id
+      data.push(docData)
     })
-    return data
+    return data.sort((a, b) => a.creationdate - b.creationdate)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getAccount = async () => {
+  try {
+    const q = query(collection(db, ACCOUNT_REF))
+    const docsSnap = await _getDocs(q)
+    if (docsSnap.empty) throw new Error("account empty !")
+    const data: AccountData[] = []
+    docsSnap.forEach((doc) => {
+      const docData = doc.data() as AccountData
+      docData["id"] = doc.id
+      data.push(docData)
+    })
+    return data.sort((a, b) => a.creationdate - b.creationdate)[0]
   } catch (error) {
     throw error
   }
@@ -45,6 +80,14 @@ export const getServiceDocs = async () => {
 export const addServiceDoc = async (data: ServiceData) => {
   try {
     return await _addDoc(collection(db, SERVICES_REF), data)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const addAccountDoc = async (data: AccountData) => {
+  try {
+    return await _addDoc(collection(db, ACCOUNT_REF), data)
   } catch (error) {
     throw error
   }

@@ -10,7 +10,7 @@ const Component = () => {
 
   return (
     <>
-      <h2 id="propositions">
+      <h2 id="propositions" className="conthrax">
         <a href="#propositions">Nos propositions :</a>
       </h2>
 
@@ -21,7 +21,7 @@ const Component = () => {
           </Col>
           <Col>
             <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer ${styles.transition_opacity_y_translateX}`} id="collecte">
+              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="collecte">
                 <a href="#collecte">- Collecte</a>
               </h3>
               <p>{"Collecte de vos achats dans tous les magasins de Tahiti de Papara à Papenoo, ou au domicile d'un particulier."}</p>
@@ -34,7 +34,7 @@ const Component = () => {
           </Col>
           <Col sm={6}>
             <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer ${styles.transition_opacity_y_translateX}`} id="livraison">
+              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="livraison">
                 <a href="#livraison">- Livraison</a>
               </h3>
               <p>
@@ -51,7 +51,7 @@ const Component = () => {
           </Col>
           <Col>
             <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer ${styles.transition_opacity_y_translateX}`} id="demenagement">
+              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="demenagement">
                 <a href="#demenagement">- Déménagement</a>
               </h3>
               <p>{"Les colis volumineux et l'électroménager : congélateur, réfrigérateur, lave-linge, four. Nous déménageons tous !"}</p>
@@ -64,7 +64,7 @@ const Component = () => {
           </Col>
           <Col sm={6}>
             <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer ${styles.transition_opacity_y_translateX}`} id="stockage">
+              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="stockage">
                 <a href="#stockage">- Stockage</a>
               </h3>
               <p>{"En partenariat avec un confrère qui stockera pour vous vos marchandises dans un conteneur sécurisé."}</p>

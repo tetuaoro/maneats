@@ -19,7 +19,7 @@ const Error404Page: NextPage = () => {
         <title>404 Page</title>
       </Head>
       <center>
-        <h1>OUPS !!</h1>
+        <h1 className="conthrax">OUPS !!</h1>
         <p className="fs-5">{"Il semble que cette page n'existe pas ou a été déplacée !"}</p>
         <Image src={page404Img} alt="Page 404" />
       </center>
