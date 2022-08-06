@@ -1,13 +1,15 @@
 @import "bootstrap/scss/functions";
 
 $primary: #d4262f;
+$modal-backdrop-opacity: 0;
+$offcanvas-backdrop-opacity: 0.5;
 
 @import "bootstrap/scss/variables";
 
 $table-hover-bg: rgba($primary, $table-hover-bg-factor);
 
 $colors: map-remove($colors, "blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "cyan");
-$theme-colors: map-remove($theme-colors, "info", "warning", "success", "danger", "secondary");
+$theme-colors: map-remove($theme-colors, "warning", "success", "danger", "secondary");
 
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";
@@ -22,8 +24,14 @@ $theme-colors: map-remove($theme-colors, "info", "warning", "success", "danger",
 @import "bootstrap/scss/nav";
 @import "bootstrap/scss/navbar";
 @import "bootstrap/scss/buttons";
+@import "bootstrap/scss/placeholders";
 @import "bootstrap/scss/card";
+@import "bootstrap/scss/forms";
 @import "bootstrap/scss/tables";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/offcanvas";
 
 @import "bootstrap/scss/helpers/position";
 @import "bootstrap/scss/utilities/api";
@@ -52,16 +60,16 @@ svg.align-text-sub {
   .text-indent {
     text-indent: 2rem;
   }
+
+  .vh-sm-100 {
+    height: 100vh;
+  }
 }
 
 html,
 body {
   padding: 0;
   margin: 0;
-}
-
-.navbar .nav-link {
-  font-family: Conthrax;
 }
 
 h2 > a:hover::after,
@@ -160,43 +168,6 @@ footer .nav-link:hover {
   box-shadow: unset;
 }
 
-.navbar-toggler:not(.collapsed) .bar:first-child {
-  transform: translateY(8px) rotate(45deg);
-}
-
-.navbar-toggler:not(.collapsed) .bar:nth-child(2) {
-  opacity: 0;
-}
-
-.navbar-toggler:not(.collapsed) .bar:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.navbar-toggler .bar {
-  display: block;
-  width: 25px;
-  height: 2px;
-  margin: 5px auto;
-  transition: all 0.3s ease-in-out;
-  background-color: var(--bs-light);
-}
-
-.navbar.bg-black .nav-link:not(.active):hover {
-  color: var(--bs-primary);
-}
-
-/* TARIFS PAGE */
-
-.table-bordered th:first-child,
-.table-bordered td:first-child {
-  border-width: 0 1px 0 0 !important;
-}
-
-.table-bordered th:last-child,
-.table-bordered td:last-child {
-  border-width: 0 0 0 1px !important;
-}
-
 /* DASHBOARD */
 
 .bg-gray-300 {
@@ -205,4 +176,16 @@ footer .nav-link:hover {
 
 .bg-gray-900 {
   background-color: $gray-900;
+}
+
+/* OFFCANVAS */
+
+.offcanvas {
+  max-width: 230px;
+}
+
+@media (min-width: 576px) {
+  .offcanvas {
+    max-width: min-content;
+  }
 }

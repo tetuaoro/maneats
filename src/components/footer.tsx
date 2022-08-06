@@ -9,7 +9,7 @@ const Footer = () => {
     <footer className="bg-dark border-top border-primary border-5 text-white">
       <Container className="conthrax pt-130 pb-5">
         <h2 className="h1 mb-0">TEVA</h2>
-        <hr className="border border-primary opacity-100 mt-0" />
+        <hr className="border border-2 border-primary opacity-100" />
         <a href={`tel:${telephone}`}>{telephone}</a>
         <div>
           <a href={isMobile ? `fb://profile/${fbId}` : `https://facebook.com/pg/${fbId}`} target="_blank" rel="noopener noreferrer">
@@ -22,7 +22,7 @@ const Footer = () => {
         <div>
           <a href={`mailto:${email}`}>{email}</a>
         </div>
-        <hr className="border border-primary w-25 opacity-75" />
+        <hr className="border border-2 border-primary opacity-75" />
         <p className="conthrax small">{"N° Tahiti : 919373 - RC : 091541A"}</p>
       </Container>
       <Container fluid className="d-flex justify-content-center">

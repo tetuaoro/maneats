@@ -8,9 +8,9 @@ gulp.task("purgecss", () => {
     .src(".next/static/css/*.css")
     .pipe(
       purgecss({
-        content: [".next/server/pages/*.html"],
+        content: [".next/server/pages/**/*.html"],
         safelist: {
-          standard: [/(collaps|fade|show).*/],
+          standard: [/(collaps|fade|show|offcanvas|btn|justify-content-end|flex-sm-column|flex-grow-1|pe-3|text-bg-dark|navbar-nav|py-sm-3|active|nav-link).*/],
         },
       })
     )

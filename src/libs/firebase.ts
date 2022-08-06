@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app"
-import { query, collection, getFirestore, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { query, collection, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 
 const firebaseConfigClientSide = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
@@ -13,8 +14,10 @@ const firebaseConfigClientSide = {
 
 const app = initializeApp(firebaseConfigClientSide)
 const db = getFirestore(app)
+const storage = getStorage(app)
 
-interface ImageSrc {
+export interface ImageSrc {
+  filename: string
   src: string
   width: number
   height: number
@@ -31,6 +34,7 @@ export interface ServiceData {
 type ContratType = "free" | "premium"
 export interface AccountData {
   name: string
+  email: string
   contratType: ContratType
   organization: string
   description: string
@@ -88,6 +92,40 @@ export const addServiceDoc = async (data: ServiceData) => {
 export const addAccountDoc = async (data: AccountData) => {
   try {
     return await _addDoc(collection(db, ACCOUNT_REF), data)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateServiceData = async (data: any, id: string) => {
+  try {
+    const serviceDbDoc = doc(collection(db, SERVICES_REF), id)
+    const docData = {
+      ...data,
+      updatedate: Date.now(),
+    }
+    await setDoc(serviceDbDoc, docData, { merge: true })
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateServiceImage = async (imageSrc: ImageSrc, file: Blob, data: ServiceData) => {
+  try {
+    const oldFilenameRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
+    const newFilenameRef = ref(ref(storage, SERVICES_REF), imageSrc.filename)
+    const serviceDbDoc = doc(collection(db, SERVICES_REF), data.id)
+
+    const uploadTask = uploadBytesResumable(newFilenameRef, file)
+    uploadTask.on("state_changed", null, null, async () => {
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+      const docData = {
+        updatedate: Date.now(),
+        imagesrc: { ...imageSrc, src: downloadURL },
+      }
+      await setDoc(serviceDbDoc, docData, { merge: true })
+      await deleteObject(oldFilenameRef)
+    })
   } catch (error) {
     throw error
   }

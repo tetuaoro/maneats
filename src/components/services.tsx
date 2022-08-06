@@ -1,11 +1,16 @@
+import type { ServiceData } from "@libs/firebase"
 import Image from "next/image"
 import { Col, Row } from "react-bootstrap"
 import { useTransition } from "@libs/hooks"
 
 import styles from "@styles/Home.module.css"
-import image1 from "@images/delivery_tahiti.png"
 
-const Component = () => {
+type Props = {
+  services: ServiceData[] | null
+}
+const Component = (props: Props) => {
+  const { services } = props
+
   useTransition()
 
   return (
@@ -15,62 +20,27 @@ const Component = () => {
       </h2>
 
       <section className="py-3 py-sm-5">
-        <Row className="pt-3 pt-sm-5">
-          <Col sm={6}>
-            <Image className={`img-observer ${styles.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
-          </Col>
-          <Col>
-            <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="collecte">
-                <a href="#collecte">- Collecte</a>
-              </h3>
-              <p>{"Collecte de vos achats dans tous les magasins de Tahiti de Papara à Papenoo, ou au domicile d'un particulier."}</p>
-            </article>
-          </Col>
-        </Row>
-        <Row className="pt-3 pt-sm-5">
-          <Col className="order-sm-2">
-            <Image className={`img-observer ${styles.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
-          </Col>
-          <Col sm={6}>
-            <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="livraison">
-                <a href="#livraison">- Livraison</a>
-              </h3>
-              <p>
-                {
-                  "La livraison à domicile ou le fret aérien ou maritime pour les îles, les courses alimentaires, les courses administratives, le transport de 2 roues, de quads, le transport d'animaux, le transport de marchandises sur palette."
-                }
-              </p>
-            </article>
-          </Col>
-        </Row>
-        <Row className="pt-3 pt-sm-5">
-          <Col sm={6}>
-            <Image className={`img-observer ${styles.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
-          </Col>
-          <Col>
-            <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="demenagement">
-                <a href="#demenagement">- Déménagement</a>
-              </h3>
-              <p>{"Les colis volumineux et l'électroménager : congélateur, réfrigérateur, lave-linge, four. Nous déménageons tous !"}</p>
-            </article>
-          </Col>
-        </Row>
-        <Row className="pt-3 pt-sm-5">
-          <Col className="order-sm-2">
-            <Image className={`img-observer ${styles.transition_opacity_y_scale}`} src={image1} alt="Livraison à Tahiti et dans les îles" />
-          </Col>
-          <Col sm={6}>
-            <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-              <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id="stockage">
-                <a href="#stockage">- Stockage</a>
-              </h3>
-              <p>{"En partenariat avec un confrère qui stockera pour vous vos marchandises dans un conteneur sécurisé."}</p>
-            </article>
-          </Col>
-        </Row>
+        {services?.map((service, k) => (
+          <Row key={k} className="pt-3 pt-sm-5">
+            <Col className={`col-sm-6 ${k % 2 === 0 ? "" : "order-sm-2"}`}>
+              <Image
+                className={`img-observer ${styles.transition_opacity_y_scale}`}
+                src={service.imagesrc.src}
+                alt={service.imagesrc.filename}
+                width={service.imagesrc.width}
+                height={service.imagesrc.height}
+              />
+            </Col>
+            <Col>
+              <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
+                <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id={service.name.toLowerCase()}>
+                  <a href={`#${service.name.toLowerCase()}`}>- {service.name}</a>
+                </h3>
+                <p>{service.description}</p>
+              </article>
+            </Col>
+          </Row>
+        ))}
       </section>
     </>
   )

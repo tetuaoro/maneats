@@ -6,6 +6,9 @@ const { InjectManifest } = require("workbox-webpack-plugin")
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    domains: ["firebasestorage.googleapis.com"],
+  },
 }
 
 const withWorkbox = (nextConfig = {}) => {

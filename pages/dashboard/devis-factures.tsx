@@ -1,42 +1,75 @@
-import type { NextPage } from "next"
-import type { ServiceData } from "@libs/firebase"
+import type { NextPage, InferGetStaticPropsType } from "next"
 import Head from "next/head"
+import { getAccount } from "@libs/firebase"
 import { sitename } from "@libs/app"
-import { getServiceDocs } from "@libs/firebase"
 import { logger } from "@libs/functions"
-import MenuSideBar from "@components/sidemenu"
+import { Card, Col, Row } from "react-bootstrap"
 
-const title = sitename + " | MyDashboard - Devis et factures"
+const title = sitename + " | MyDashboard - Compte"
 
-interface PageProps {
-  services: string | null
-}
-
-const Page: NextPage<PageProps> = (props) => {
-  const services: ServiceData[] | null = props.services ? JSON.parse(props.services) : null
+const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
+  const { account } = props
 
   return (
-    <div className="d-flex">
-      <MenuSideBar />
-      <main className="container pt-3 pt-sm-5">
-        <Head>
-          <title>{title}</title>
-          <meta name="robots" content="noindex" />
-        </Head>
-        <h1>Devis et factures</h1>
-        <ul>{services && services.map((doc, k) => <li key={k}>{doc.name}</li>)}</ul>
-      </main>
-    </div>
+    <main className="container pt-3 pt-sm-5 bg-gray-300">
+      <Head>
+        <title>{title}</title>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <h1>Compte</h1>
+      <Row xs={1} sm={2} md={3} className="g-4 pt-5">
+        <Col>
+          <Card className="shadow">
+            <Card.Body>
+              <h2 className="h6">Nom</h2>
+              <p>{account?.name}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card className="shadow">
+            <Card.Body>
+              <h2 className="h6">Description</h2>
+              <p>{account?.description}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card className="shadow">
+            <Card.Body>
+              <h2 className="h6">Type de contrat</h2>
+              <p>{account?.contratType}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card className="shadow">
+            <Card.Body>
+              <h2 className="h6">Mise en ligne du contrat</h2>
+              <p>{new Date(account && account.creationdate ? account.creationdate : "").toLocaleString()}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card className="shadow">
+            <Card.Body>
+              <h2 className="h6">Fin du contrat</h2>
+              <p>{account && account.enddate ? new Date(account.enddate).toLocaleString() : "indéterminé"}</p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </main>
   )
 }
 
-export const getServerSideProps = async () => {
+export const getStaticProps = async () => {
   try {
-    const data = await getServiceDocs()
-    return { props: { services: JSON.stringify(data) } }
+    const data = await getAccount()
+    return { props: { account: data }, revalidate: 120 }
   } catch (error) {
     logger("err", error)
-    return { props: { services: null } }
+    return { props: { account: null }, revalidate: 120 }
   }
 }
 

@@ -1,4 +1,4 @@
-import type { NextPage } from "next"
+import type { InferGetStaticPropsType, NextPage } from "next"
 import Head from "next/head"
 import { Workbox } from "workbox-window"
 import { useEffect } from "react"
@@ -8,6 +8,7 @@ import Organization from "@libs/schema"
 import PurposeLayout from "@components/services"
 import EstimateLayout from "@components/estimates"
 import { logger } from "@libs/functions"
+import { getServiceDocs } from "@libs/firebase"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -41,36 +42,34 @@ const MainLayout = () => {
   )
 }
 
-const Page: NextPage = () => {
+const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
   useEffect(() => {
-    // if (!("serviceWorker" in navigator) && !process.env.NEXT_PUBLIC_PWA_ENABLED) {
-    //   console.warn("Pwa support is disabled")
-    //   return
-    // }
-
-    const ff = async () => {
-      if ("serviceWorker" in navigator) {
-        const registrations = await navigator.serviceWorker.getRegistrations()
-        for (const registration of registrations) {
-          logger("log", "unregister sw", await registration.unregister())
+    if (!process.env.NEXT_PUBLIC_PWA_ENABLED) {
+      logger("warn", "Pwa support is disabled")
+      const ff = async () => {
+        if ("serviceWorker" in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations()
+          for (const registration of registrations) {
+            logger("log", "unregister sw", await registration.unregister())
+          }
         }
       }
+
+      ff()
+      return
     }
+    const wb = new Workbox("sw.js", { scope: "/" })
+    const id = setTimeout(async () => {
+      try {
+        await wb.register()
+      } catch (error) {
+        logger("err", error)
+      }
+    }, 11000)
 
-    ff()
-
-    // const wb = new Workbox("sw.js", { scope: "/" })
-    // const id = setTimeout(async () => {
-    //   try {
-    //     await wb.register()
-    //   } catch (error) {
-    //     console.error(error)
-    //   }
-    // }, 11000)
-
-    // return () => {
-    //   clearTimeout(id)
-    // }
+    return () => {
+      clearTimeout(id)
+    }
   }, [])
 
   return (
@@ -90,25 +89,21 @@ const Page: NextPage = () => {
         <meta property="og:image:type" content="image/png" />
         <script type="application/ld+json">{JSON.stringify(Organization)}</script>
       </Head>
-
       <MainLayout />
-      <PurposeLayout />
+      <PurposeLayout services={props.services} />
       <EstimateLayout />
-
-      {/* <p className="fs-6 text-muted py-5">
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" className="align-text-sub text-warning me-3 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-        </svg>
-        {
-          "Pour rappel, pour toute demande de prix, veuillez préciser clairement : la nature des affaires ou des colis et leurs quantités ; les lieux de récupération et de livraison. Vous avez la posibilité de configurer une estimation de prix sur la page "
-        }
-        <Link href="/tarifs">
-          <a>tarifs</a>
-        </Link>
-        .
-      </p> */}
     </main>
   )
+}
+
+export const getStaticProps = async () => {
+  try {
+    const data = await getServiceDocs()
+    return { props: { services: data }, revalidate: 120 }
+  } catch (error) {
+    logger("err", error)
+    return { props: { services: null }, revalidate: 120 }
+  }
 }
 
 export default Page
