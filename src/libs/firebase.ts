@@ -1,6 +1,9 @@
+import type { NextOrObserver, User } from "firebase/auth"
 import { initializeApp } from "firebase/app"
-import { query, collection, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
+import { initializeAuth, signInWithEmailAndPassword, onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
+import { logger } from "./functions"
 
 const firebaseConfigClientSide = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
@@ -15,6 +18,7 @@ const firebaseConfigClientSide = {
 const app = initializeApp(firebaseConfigClientSide)
 const db = getFirestore(app)
 const storage = getStorage(app)
+const auth = initializeAuth(app, { persistence: browserLocalPersistence })
 
 export interface ImageSrc {
   filename: string
@@ -47,18 +51,20 @@ export interface AccountData {
 export const SERVICES_REF = "services"
 export const ACCOUNT_REF = "account"
 
-export const getServiceDocs = async () => {
+export const authentication = async (email: string, password: string, onAuthStateChangedObserver?: NextOrObserver<User>) => {
   try {
-    const q = query(collection(db, SERVICES_REF))
-    const docsSnap = await _getDocs(q)
-    if (docsSnap.empty) throw new Error("services empty !")
-    const data: ServiceData[] = []
-    docsSnap.forEach((doc) => {
-      const docData = doc.data() as ServiceData
-      docData["id"] = doc.id
-      data.push(docData)
-    })
-    return data.sort((a, b) => a.creationdate - b.creationdate)
+    await setPersistence(auth, browserLocalPersistence)
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const unsubscribe = onAuthStateChangedObserver ? onAuthStateChanged(auth, onAuthStateChangedObserver) : null
+    return { userCredential, unsubscribe }
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateAuthenticationPassword = async (newpassword: string) => {
+  try {
+    if (auth && auth.currentUser) return await updatePassword(auth.currentUser, newpassword)
   } catch (error) {
     throw error
   }
@@ -81,14 +87,6 @@ export const getAccount = async () => {
   }
 }
 
-export const addServiceDoc = async (data: ServiceData) => {
-  try {
-    return await _addDoc(collection(db, SERVICES_REF), data)
-  } catch (error) {
-    throw error
-  }
-}
-
 export const addAccountDoc = async (data: AccountData) => {
   try {
     return await _addDoc(collection(db, ACCOUNT_REF), data)
@@ -97,35 +95,74 @@ export const addAccountDoc = async (data: AccountData) => {
   }
 }
 
-export const updateServiceData = async (data: any, id: string) => {
+export const getServiceDocs = async () => {
   try {
-    const serviceDbDoc = doc(collection(db, SERVICES_REF), id)
-    const docData = {
-      ...data,
-      updatedate: Date.now(),
-    }
-    await setDoc(serviceDbDoc, docData, { merge: true })
+    const q = query(collection(db, SERVICES_REF))
+    const docsSnap = await _getDocs(q)
+    if (docsSnap.empty) throw new Error("services empty !")
+    const data: ServiceData[] = []
+    docsSnap.forEach((doc) => {
+      const docData = doc.data() as ServiceData
+      docData["id"] = doc.id
+      data.push(docData)
+    })
+    return data.sort((a, b) => a.creationdate - b.creationdate)
   } catch (error) {
     throw error
   }
 }
 
-export const updateServiceImage = async (imageSrc: ImageSrc, file: Blob, data: ServiceData) => {
+export const addServiceDoc = async (data: ServiceData) => {
   try {
-    const oldFilenameRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
-    const newFilenameRef = ref(ref(storage, SERVICES_REF), imageSrc.filename)
-    const serviceDbDoc = doc(collection(db, SERVICES_REF), data.id)
+    return await _addDoc(collection(db, SERVICES_REF), data)
+  } catch (error) {
+    throw error
+  }
+}
 
-    const uploadTask = uploadBytesResumable(newFilenameRef, file)
-    uploadTask.on("state_changed", null, null, async () => {
+export const removeServiceDoc = async (data: ServiceData) => {
+  try {
+    const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
+    const fileRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
+    logger("log", data)
+    await deleteObject(fileRef)
+    await deleteDoc(serviceDataDoc)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateServiceDoc = async (data: any, id: string) => {
+  try {
+    const serviceDataDoc = doc(collection(db, SERVICES_REF), id)
+    const docData = {
+      ...data,
+      updatedate: Date.now(),
+    }
+    await setDoc(serviceDataDoc, docData, { merge: true })
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateServiceDocImage = async (imageSrc: ImageSrc, file: Blob, data: ServiceData) => {
+  try {
+    const oldFileRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
+    const newFileRef = ref(ref(storage, SERVICES_REF), imageSrc.filename)
+    const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
+
+    const uploadTask = uploadBytesResumable(newFileRef, file)
+    const { state } = await uploadTask
+    if (state === "success") {
       const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
       const docData = {
         updatedate: Date.now(),
         imagesrc: { ...imageSrc, src: downloadURL },
       }
-      await setDoc(serviceDbDoc, docData, { merge: true })
-      await deleteObject(oldFilenameRef)
-    })
+      await setDoc(serviceDataDoc, docData, { merge: true })
+      await deleteObject(oldFileRef)
+    }
+    return state
   } catch (error) {
     throw error
   }

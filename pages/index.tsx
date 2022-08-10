@@ -5,7 +5,7 @@ import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 
-import PurposeLayout from "@components/services"
+import ServiceLayout from "@components/services"
 import EstimateLayout from "@components/estimates"
 import { logger } from "@libs/functions"
 import { getServiceDocs } from "@libs/firebase"
@@ -90,7 +90,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
         <script type="application/ld+json">{JSON.stringify(Organization)}</script>
       </Head>
       <MainLayout />
-      <PurposeLayout services={props.services} />
+      <ServiceLayout services={props.services} />
       <EstimateLayout />
     </main>
   )
@@ -99,10 +99,10 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 export const getStaticProps = async () => {
   try {
     const data = await getServiceDocs()
-    return { props: { services: data }, revalidate: 120 }
+    return { props: { services: data }, revalidate: 180 }
   } catch (error) {
     logger("err", error)
-    return { props: { services: null }, revalidate: 120 }
+    return { props: { services: null }, revalidate: 180 }
   }
 }
 

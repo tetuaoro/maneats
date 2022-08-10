@@ -9,7 +9,7 @@ $offcanvas-backdrop-opacity: 0.5;
 $table-hover-bg: rgba($primary, $table-hover-bg-factor);
 
 $colors: map-remove($colors, "blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "cyan");
-$theme-colors: map-remove($theme-colors, "warning", "success", "danger", "secondary");
+$theme-colors: map-remove($theme-colors, "warning", "secondary");
 
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";

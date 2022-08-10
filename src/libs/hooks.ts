@@ -1,3 +1,4 @@
+import { UserCredential } from "firebase/auth"
 import { useState, useEffect } from "react"
 
 export const isDeviceMobile = () => {
