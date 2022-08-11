@@ -6,16 +6,16 @@ import { sitename } from "@libs/app"
 import { logger } from "@libs/functions"
 import { Button, Card, Col, Row } from "react-bootstrap"
 import Image from "next/image"
-import AppC from "@libs/context"
+// import AppC from "@libs/context"
 
 import styles from "@styles/Service.module.scss"
-import React, { useContext, useState } from "react"
+import React, { /* useContext, */ useState } from "react"
 
 const title = sitename + " | MyDashboard - Services"
 
 const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
   const [services, setServiceData] = useState(props.services)
-  const { setModal } = useContext(AppC)
+  // const { setModal } = useContext(AppC)
 
   const updateServiceDataState = async () => {
     try {
@@ -27,7 +27,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
   }
 
   const handleImg = (e: any, id?: string) => {
-    const modalError = () => setModal("Erreur lors de la modification de l'image !")
+    // const modalError = () => setModal("Erreur lors de la modification de l'image !")
 
     try {
       e.preventDefault()
@@ -49,15 +49,15 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
           const state = await updateServiceDocImage(imageSrc, imgFile, data as ServiceData)
           if (state !== "success") throw "no success"
           await updateServiceDataState()
-          setModal("Image modifiée !", 2000, "success")
+          // setModal("Image modifiée !", 2000, "success")
         } catch (error) {
-          modalError()
+          // modalError()
         }
       }
 
       img.src = window.URL.createObjectURL(imgFile)
     } catch (error) {
-      modalError()
+      // modalError()
     }
   }
 
@@ -91,7 +91,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       await addServiceDoc(newservice)
       await updateServiceDataState()
     } catch (error) {
-      setModal("Erreur lors de l'ajout du service !", 4000, "danger")
+      // setModal("Erreur lors de l'ajout du service !", 4000, "danger")
     }
   }
 
@@ -101,9 +101,9 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       const service = services?.find((s) => s.id === id)
       await removeServiceDoc(service as ServiceData)
       await updateServiceDataState()
-      setModal("Service supprimé !", 2000, "success")
+      // setModal("Service supprimé !", 2000, "success")
     } catch (error) {
-      setModal("Erreur lors de la suppression du service !", 4000, "danger")
+      // setModal("Erreur lors de la suppression du service !", 4000, "danger")
     }
   }
 

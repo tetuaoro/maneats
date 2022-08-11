@@ -10,7 +10,7 @@ gulp.task("purgecss", () => {
       purgecss({
         content: [".next/server/pages/**/*.html"],
         safelist: {
-          standard: [/(collaps|modal|fade|show|offcanvas|btn|justify-content-end|flex-sm-column|flex-grow-1|pe-3|text-bg-dark|navbar-nav|py-sm-3|active|nav-link).*/],
+          standard: [/(collaps|modal|fixed-bottom|alert|p-0|m-0|fade|show|offcanvas|btn|justify-content-end|flex-sm-column|flex-grow-1|pe-3|text-bg-dark|navbar-nav|py-sm-3|active|nav-link).*/],
         },
       })
     )

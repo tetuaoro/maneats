@@ -1,5 +1,32 @@
-import { atom } from "recoil"
-import { logger } from "./functions"
+import { atom, selector } from "recoil"
+
+import Login from "@components/dashboard/login"
+import Account from "@components/dashboard/account"
+
+export type RouteType = "Account" | "Login" | null
+type JSXElementType = typeof Account | typeof Login
+
+export const ROUTE_VALUES = {
+  ACCOUNT: "Account",
+  LOGIN: "Login",
+}
+
+export const routeState = atom<RouteType>({
+  key: "route-atom-state",
+  default: null,
+})
+
+export const componentState = selector<JSXElementType>({
+  key: "component-selector-state",
+  get: ({ get }) => {
+    switch (get(routeState)) {
+      case "Account":
+        return Account
+      default:
+        return Login
+    }
+  },
+})
 
 type ModalStateType = {
   text: string
@@ -16,12 +43,12 @@ export const modalAtomState = atom<ModalStateType>({
   },
   effects: [
     ({ onSet, resetSelf }) => {
-      let id: NodeJS.Timeout | null = null
       onSet(({ timeout }) => {
-        id = setTimeout(() => resetSelf(), timeout || 3200)
+        const id = setTimeout(() => {
+          resetSelf()
+          clearTimeout(id)
+        }, timeout || 3200)
       })
-
-      return () => id && clearTimeout(id)
     },
   ],
 })

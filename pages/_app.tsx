@@ -1,6 +1,7 @@
 import "@styles/globals.scss"
 import type { AppProps } from "next/app"
 import { useRouter } from "next/router"
+import { RecoilRoot } from "recoil"
 
 import Header from "@components/header"
 import Footer from "@components/footer"
@@ -8,16 +9,14 @@ import Footer from "@components/footer"
 function App({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
 
-  if (pathname.startsWith("/dashboard")) {
-    return <Component {...pageProps} />
-  }
+  const isDashboard = pathname.startsWith("/dashboard")
 
   return (
-    <>
-      <Header />
+    <RecoilRoot>
+      {!isDashboard && <Header />}
       <Component {...pageProps} />
-      <Footer />
-    </>
+      {!isDashboard && <Footer />}
+    </RecoilRoot>
   )
 }
 

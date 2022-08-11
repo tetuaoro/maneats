@@ -1,22 +1,22 @@
 import type { NextPage, InferGetStaticPropsType } from "next"
+import type { FormEvent /* , useContext */ } from "react"
 import { Button, Card, Col, Form, Row, Placeholder } from "react-bootstrap"
-import { FormEvent, useContext } from "react"
 import Head from "next/head"
 import { getAccount } from "@libs/firebase"
 import { sitename } from "@libs/app"
 import { logger } from "@libs/functions"
-import AppC from "@libs/context"
+// import AppC from "@libs/context"
 
 const title = sitename + " | MyDashboard - Compte et Métrics"
 
 const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
   const { account } = props
 
-  const { setModal } = useContext(AppC)
+  // const { setModal } = useContext(AppC)
 
   const handleForm = (e: FormEvent) => {
     e.preventDefault()
-    setModal("Mot de passe modifié !")
+    // setModal("Mot de passe modifié !")
   }
 
   return (

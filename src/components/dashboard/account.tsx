@@ -1,19 +1,14 @@
-import type { NextPage, InferGetStaticPropsType } from "next"
+import type { FormEvent } from "react"
 import { Button, Card, Col, Form, Row, Placeholder } from "react-bootstrap"
-import { FormEvent, useContext, useState, useRef } from "react"
-import Head from "next/head"
-import { getAccount, updateAuthenticationPassword } from "@libs/firebase"
+import { useState, useRef } from "react"
+import { updateAuthenticationPassword } from "@libs/firebase"
 import { sitename } from "@libs/app"
 import { logger } from "@libs/functions"
-import AppC from "@libs/context"
 
-const title = sitename + " | MyDashboard - Compte et Métrics"
-
-const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
-  const { account } = props
+const Component = () => {
+  const account = { email: "mon email", name: "mon name", contratType: "oul", description: "ma descrip bro", creationdate: Date.now(), enddate: Date.now() }
   const passwordRef = useRef<HTMLInputElement | null>(null)
 
-  const { setModal } = useContext(AppC)
   const [validated, setValidated] = useState(false)
 
   const handleForm = async (e: FormEvent<HTMLFormElement>) => {
@@ -29,19 +24,15 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       const { current: password } = passwordRef
       if (!password) throw "no valid"
       await updateAuthenticationPassword(password?.value || "")
-      setModal("Mot de passe modifié avec succès !", 2000, "success")
+      // setModal("Mot de passe modifié avec succès !", 2000, "success")
     } catch (error) {
       logger("err", error)
-      setModal("Erreur lors de la modification du mot de passe !", 6000, "danger")
+      // setModal("Erreur lors de la modification du mot de passe !", 6000, "danger")
     }
   }
 
   return (
-    <main className="container py-3 py-sm-5 bg-gray-300">
-      <Head>
-        <title>{title}</title>
-        <meta name="robots" content="noindex" />
-      </Head>
+    <main className="container py-2 py-sm-4 bg-gray-300">
       <h1>Compte et métrics</h1>
       <Card className="shadow mt-5">
         <Card.Body>
@@ -123,14 +114,4 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
   )
 }
 
-export const getStaticProps = async () => {
-  try {
-    const data = await getAccount()
-    return { props: { account: data }, revalidate: 10 }
-  } catch (error) {
-    logger("err", error)
-    return { props: { account: null }, revalidate: 10 }
-  }
-}
-
-export default Page
+export default Component

@@ -1,21 +1,21 @@
-import type { NextPage } from "next"
 import type { NextOrObserver, User } from "firebase/auth"
-import Head from "next/head"
+import type { FormEvent } from "react"
 import { sitename } from "@libs/app"
 import { logger } from "@libs/functions"
 import { Button, Col, Form, Row } from "react-bootstrap"
-import { FormEvent, FormEventHandler, useContext, useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 
 import AppC from "@libs/context"
 import { authentication } from "@libs/firebase"
+import { useSetRecoilState } from "recoil"
+import { modalAtomState } from "@libs/atoms"
 
-const title = sitename + " | MyDashboard - Compte et Métrics"
-
-const Page: NextPage = () => {
+const Component = () => {
   const emailRef = useRef<HTMLInputElement | null>(null)
   const passwordRef = useRef<HTMLInputElement | null>(null)
-  const { setAuth, setModal } = useContext(AppC)
   const [validated, setValidated] = useState(false)
+
+  const setModal = useSetRecoilState(modalAtomState)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     try {
@@ -29,30 +29,30 @@ const Page: NextPage = () => {
 
       const { current: email } = emailRef
       const { current: password } = passwordRef
+      if (!email) throw "no valid"
       if (!password) throw "no valid"
-      const authenticationObserver: NextOrObserver<User> = (user) => {
-        if (!user) {
-          setAuth(null)
-        }
-      }
-      const { userCredential } = await authentication(email?.value || "", password?.value || "", authenticationObserver)
-      setAuth(userCredential)
+
+      setModal({ show: true, text: `L'email est ${email.value} et le mot de passe est ${password.value}` })
+
+      // const authenticationObserver: NextOrObserver<User> = (user) => {
+      //   if (!user) {
+      //     setAuth(null)
+      //   }
+      // }
+      // const { userCredential } = await authentication(email?.value || "", password?.value || "", authenticationObserver)
+      // setAuth(userCredential)
     } catch (error) {
       logger("err", error)
-      setModal("Le nom d'utilisateur ou le mot de passe est erroné !", 6000, "danger")
+      setModal({ show: true, text: "Le nom d'utilisateur ou le mot de passe est erroné !", timeout: 6000, variant: "danger" })
     }
   }
 
   return (
-    <main className="container py-3 py-sm-5 bg-gray-300">
-      <Head>
-        <title>{title}</title>
-        <meta name="robots" content="noindex" />
-      </Head>
+    <main className="container py-2 py-sm-4 bg-gray-300">
       <h1>Se connecter</h1>
       <Row>
         <Col></Col>
-        <Col sm={5} md={4}>
+        <Col sm={7}>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Addresse email</Form.Label>
@@ -76,4 +76,4 @@ const Page: NextPage = () => {
   )
 }
 
-export default Page
+export default Component
