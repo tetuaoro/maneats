@@ -1,13 +1,20 @@
+import type { Variant } from "react-bootstrap/esm/types"
 import type { UserCredential } from "firebase/auth"
 import type { Dispatch, SetStateAction } from "react"
 import { createContext } from "react"
 
+export type ModalParams = {
+  text: string
+  timeout?: number
+  variant?: Variant
+}
+
 const AppContext = createContext<{
-  setModal: (_text: string, _timeout?: number, _variant?: string) => void
+  setModal: (params: ModalParams) => void
   setAuth: Dispatch<SetStateAction<UserCredential | null>>
   auth: UserCredential | null
 }>({
-  setModal: (_text: string, _timeout?: number) => {},
+  setModal: () => {},
   setAuth: () => {},
   auth: null,
 })

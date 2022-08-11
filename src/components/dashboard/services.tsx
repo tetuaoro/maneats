@@ -151,10 +151,10 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 export const getStaticProps = async () => {
   try {
     const data = await getServiceDocs()
-    return { props: { services: data }, revalidate: 180 }
+    return { props: { services: data }, revalidate: 10 }
   } catch (error) {
     logger("err", error)
-    return { props: { services: null }, revalidate: 180 }
+    return { props: { services: null }, revalidate: 10 }
   }
 }
 

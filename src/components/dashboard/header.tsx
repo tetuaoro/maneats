@@ -6,7 +6,7 @@ import { sitename } from "@libs/app"
 
 const NavbarOffcanvas = dynamic(() => import("react-bootstrap/NavbarOffcanvas"), { ssr: false })
 
-function Header() {
+const Navigation = () => {
   const { pathname } = useRouter()
   return (
     <Navbar sticky="top" bg="dark" variant="dark" expand="sm" collapseOnSelect className="vh-sm-100 align-items-sm-start">
@@ -46,4 +46,4 @@ function Header() {
   )
 }
 
-export default Header
+export default Navigation
