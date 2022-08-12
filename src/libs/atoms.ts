@@ -1,17 +1,78 @@
+import type { User } from "firebase/auth"
+import type { AccountData, ServiceData } from "./firebase"
+import { onAuthStateChanged, getAccount, getServices } from "./firebase"
 import { atom, selector } from "recoil"
 
 import Login from "@components/dashboard/login"
 import Account from "@components/dashboard/account"
+import { logger } from "./functions"
 
-export type RouteType = "Account" | "Login" | null
+/* AUTHENTICATION WITH FIREBASE */
+
+export const authState = atom<User | null>({
+  key: "auth-atom-state",
+  default: null,
+  effects: [
+    ({ setSelf }) => {
+      try {
+        const unsubscribe = onAuthStateChanged((user) => setSelf(user ? JSON.parse(JSON.stringify(user)) : user))
+        return () => {
+          setSelf(null)
+          unsubscribe()
+        }
+      } catch (error) {
+        logger("err", error)
+        setSelf(null)
+      }
+    },
+  ],
+})
+
+/* ACCOUNT DATA WITH FIREBASE */
+
+export const accountState = selector<AccountData | null>({
+  key: "account-selector-state",
+  get: async ({ get }) => {
+    try {
+      if (!get(authState)) return null
+      return await getAccount()
+    } catch (error) {
+      logger("err", error)
+      return null
+    }
+  },
+})
+
+/* SERVICES DATA WITH FIREBASE */
+
+export const servicesState = selector<ServiceData[] | null>({
+  key: "services-selector-state",
+  get: async ({ get }) => {
+    try {
+      if (!get(authState)) return null
+      return await getServices()
+    } catch (error) {
+      logger("err", error)
+      return null
+    }
+  },
+})
+
+/* ROUTES & COMPONENTS */
+
+export type RouteType = "Account" | "Login"
 type JSXElementType = typeof Account | typeof Login
 
-export const ROUTE_VALUES = {
+type RouteValuesType = {
+  ACCOUNT: RouteType
+  LOGIN: RouteType
+}
+export const ROUTE_VALUES: RouteValuesType = {
   ACCOUNT: "Account",
   LOGIN: "Login",
 }
 
-export const routeState = atom<RouteType>({
+export const routeState = atom<RouteType | null>({
   key: "route-atom-state",
   default: null,
 })
@@ -19,33 +80,32 @@ export const routeState = atom<RouteType>({
 export const componentState = selector<JSXElementType>({
   key: "component-selector-state",
   get: ({ get }) => {
+    if (!get(authState)) return Login
     switch (get(routeState)) {
-      case "Account":
-        return Account
       default:
-        return Login
+        return Account
     }
   },
 })
 
-type ModalStateType = {
+/* MODAL */
+
+type ModalType = {
   text: string
-  show: boolean
   variant?: string
   timeout?: number
 }
 
-export const modalAtomState = atom<ModalStateType>({
+export const modalState = atom<ModalType>({
   key: "modal-atom-state",
   default: {
-    show: false,
     text: "",
   },
   effects: [
-    ({ onSet, resetSelf }) => {
+    ({ onSet, setSelf }) => {
       onSet(({ timeout }) => {
         const id = setTimeout(() => {
-          resetSelf()
+          setSelf({ text: "" })
           clearTimeout(id)
         }, timeout || 3200)
       })

@@ -1,15 +1,32 @@
 // import type { PropsWithChildren } from "react"
 import type { MouseEvent } from "react"
-import type { RouteType } from "@libs/atoms"
-import { Alert, Container, Modal, Nav, Navbar, Offcanvas, Button } from "react-bootstrap"
-import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil"
 import Link from "next/link"
 import dynamic from "next/dynamic"
+import { Alert, Container, Modal, Nav, Navbar, Offcanvas, Button } from "react-bootstrap"
+import { useRecoilValue, useSetRecoilState } from "recoil"
 import { sitename } from "@libs/app"
-import { modalAtomState, routeState, ROUTE_VALUES, componentState } from "@libs/atoms"
-import { logger } from "@libs/functions"
+import { modalState, authState, routeState, ROUTE_VALUES, componentState } from "@libs/atoms"
+import { signOutMe } from "@libs/firebase"
 
 const NavbarOffcanvas = dynamic(() => import("react-bootstrap/NavbarOffcanvas"), { ssr: false })
+
+const LoginBtn = () => {
+  const auth = useRecoilValue(authState)
+  const setModal = useSetRecoilState(modalState)
+
+  const handleLogin = async () => {
+    try {
+      auth && (await signOutMe())
+    } catch (error) {
+      setModal({ text: "Une erreur est survenue !", timeout: 4200, variant: "danger" })
+    }
+  }
+  return (
+    <Button onClick={handleLogin} variant={auth ? "light" : "info"}>
+      {auth ? "Deconnexion" : "Se connecter"}
+    </Button>
+  )
+}
 
 const Navs = () => {
   const setRoute = useSetRecoilState(routeState)
@@ -23,9 +40,7 @@ const Navs = () => {
   return (
     <>
       <Nav.Item as="li">
-        <Nav.Link onClick={handleClick} id={ROUTE_VALUES.LOGIN} className="py-sm-3">
-          Se connecter
-        </Nav.Link>
+        <LoginBtn />
       </Nav.Item>
       <Nav.Item as="li">
         <Nav.Link onClick={handleClick} id={ROUTE_VALUES.ACCOUNT} className="py-sm-3">
@@ -74,7 +89,7 @@ const Navigation = () => {
 }
 
 const Component = () => {
-  const { text, variant, show } = useRecoilValue(modalAtomState)
+  const { text, variant } = useRecoilValue(modalState)
   const ComponentState = useRecoilValue(componentState)
 
   const onEnter = () => {
@@ -87,9 +102,9 @@ const Component = () => {
 
   return (
     <>
-      <Modal show={show} backdrop={false} dialogClassName="fixed-bottom" onEnter={onEnter}>
+      <Modal show={text.length > 0 ? true : false} backdrop={false} dialogClassName="fixed-bottom" onEnter={onEnter}>
         <Modal.Body className="p-0">
-          <Alert className="m-0" variant={variant || "info"}>
+          <Alert className="m-0" variant={variant}>
             {text}
           </Alert>
         </Modal.Body>

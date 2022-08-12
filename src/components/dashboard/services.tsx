@@ -1,25 +1,23 @@
 import type { NextPage, InferGetStaticPropsType } from "next"
-import { addServiceDoc, ImageSrc, ServiceData } from "@libs/firebase"
+import type { Image, ServiceData } from "@libs/firebase"
+import { Button, Card, Col, Row } from "react-bootstrap"
+import NextImage from "next/image"
 import Head from "next/head"
-import { getServiceDocs, updateServiceDocImage, updateServiceDoc, removeServiceDoc } from "@libs/firebase"
+import { getServices, addServiceDoc, updateServiceDocImage, updateServiceDoc, removeServiceDoc } from "@libs/firebase"
 import { sitename } from "@libs/app"
 import { logger } from "@libs/functions"
-import { Button, Card, Col, Row } from "react-bootstrap"
-import Image from "next/image"
-// import AppC from "@libs/context"
 
 import styles from "@styles/Service.module.scss"
-import React, { /* useContext, */ useState } from "react"
+import { useState } from "react"
 
 const title = sitename + " | MyDashboard - Services"
 
 const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
   const [services, setServiceData] = useState(props.services)
-  // const { setModal } = useContext(AppC)
 
   const updateServiceDataState = async () => {
     try {
-      const updatedServices = await getServiceDocs()
+      const updatedServices = await getServices()
       setServiceData(updatedServices)
     } catch (error) {
       throw error
@@ -37,7 +35,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       const img = document.createElement("img")
       img.onload = async () => {
         try {
-          const imageSrc: ImageSrc = {
+          const image: Image = {
             filename: Date.now() + "-" + imgFile.name,
             width: img.naturalWidth,
             height: img.naturalHeight,
@@ -46,7 +44,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 
           const service = services?.find((s) => s.id === id)
           const data = structuredClone(service)
-          const state = await updateServiceDocImage(imageSrc, imgFile, data as ServiceData)
+          const state = await updateServiceDocImage(image, imgFile, data as ServiceData)
           if (state !== "success") throw "no success"
           await updateServiceDataState()
           // setModal("Image modifiée !", 2000, "success")
@@ -80,7 +78,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       const newservice: ServiceData = {
         name: "new service",
         description: "new description",
-        imagesrc: {
+        image: {
           src: "/images/delivery_tahiti.png",
           width: 626,
           height: 454,
@@ -122,7 +120,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
           <Col key={k}>
             <Card className="shadow">
               <label htmlFor={`for-card-img-${k}`}>
-                <Image className={`card-img-top ${styles.cardImgForm}`} alt={service.name} width={service.imagesrc.width} height={service.imagesrc.height} src={service.imagesrc.src} />
+                <NextImage className={`card-img-top ${styles.cardImgForm}`} alt={service.name} width={service.image.width} height={service.image.height} src={service.image.src} />
               </label>
               <input onChange={(e) => handleImg(e, service.id)} className="d-none" accept="image/*" id={`for-card-img-${k}`} type="file" />
               <Card.Body>
@@ -150,7 +148,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 
 export const getStaticProps = async () => {
   try {
-    const data = await getServiceDocs()
+    const data = await getServices()
     return { props: { services: data }, revalidate: 10 }
   } catch (error) {
     logger("err", error)

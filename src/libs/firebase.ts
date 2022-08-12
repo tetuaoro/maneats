@@ -1,8 +1,9 @@
 import type { NextOrObserver, User } from "firebase/auth"
+import type { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-import { query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
-import { initializeAuth, signInWithEmailAndPassword, onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
+import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./functions"
 
 const firebaseConfigClientSide = {
@@ -20,7 +21,7 @@ const db = getFirestore(app)
 const storage = getStorage(app)
 const auth = initializeAuth(app, { persistence: browserLocalPersistence })
 
-export interface ImageSrc {
+export interface Image {
   filename: string
   src: string
   width: number
@@ -28,7 +29,7 @@ export interface ImageSrc {
 }
 export interface ServiceData {
   name: string
-  imagesrc: ImageSrc
+  image: Image
   description: string
   creationdate: number
   updatedate?: number
@@ -51,12 +52,25 @@ export interface AccountData {
 export const SERVICES_REF = "services"
 export const ACCOUNT_REF = "account"
 
-export const authentication = async (email: string, password: string, onAuthStateChangedObserver?: NextOrObserver<User>) => {
+export const signOutMe = async () => {
   try {
-    await setPersistence(auth, browserLocalPersistence)
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
-    const unsubscribe = onAuthStateChangedObserver ? onAuthStateChanged(auth, onAuthStateChangedObserver) : null
-    return { userCredential, unsubscribe }
+    return await signOut(auth)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const onAuthStateChanged = (onAuthStateChangedObserver: NextOrObserver<User>) => {
+  try {
+    return _onAuthStateChanged(auth, onAuthStateChangedObserver)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const loginWithEmail = async (email: string, password: string) => {
+  try {
+    return await signInWithEmailAndPassword(auth, email, password)
   } catch (error) {
     throw error
   }
@@ -70,24 +84,29 @@ export const updateAuthenticationPassword = async (newpassword: string) => {
   }
 }
 
-export const getAccount = async () => {
+export const onAccountStateChanged = (onAccountStateChangedObserver: (doc: DocumentSnapshot<DocumentData>) => void) => {
   try {
-    const q = query(collection(db, ACCOUNT_REF))
-    const docsSnap = await _getDocs(q)
-    if (docsSnap.empty) throw new Error("account empty !")
-    const data: AccountData[] = []
-    docsSnap.forEach((doc) => {
-      const docData = doc.data() as AccountData
-      docData["id"] = doc.id
-      data.push(docData)
-    })
-    return data.sort((a, b) => a.creationdate - b.creationdate)[0]
+    const docId = "54ckQ6JK8nQkyNea1r3J"
+    const docRef = doc(collection(db, ACCOUNT_REF), docId)
+    return onSnapshot(docRef, onAccountStateChangedObserver)
   } catch (error) {
     throw error
   }
 }
 
-export const addAccountDoc = async (data: AccountData) => {
+export const getAccount = async () => {
+  try {
+    const docId = "54ckQ6JK8nQkyNea1r3J"
+    const docRef = doc(collection(db, ACCOUNT_REF), docId)
+    const docSnap = await _getDoc(docRef)
+    if (!docSnap.exists()) throw new Error("account empty !")
+    return docSnap.data() as AccountData
+  } catch (error) {
+    throw error
+  }
+}
+
+export const addAccount = async (data: AccountData) => {
   try {
     return await _addDoc(collection(db, ACCOUNT_REF), data)
   } catch (error) {
@@ -95,7 +114,7 @@ export const addAccountDoc = async (data: AccountData) => {
   }
 }
 
-export const getServiceDocs = async () => {
+export const getServices = async () => {
   try {
     const q = query(collection(db, SERVICES_REF))
     const docsSnap = await _getDocs(q)
@@ -123,7 +142,7 @@ export const addServiceDoc = async (data: ServiceData) => {
 export const removeServiceDoc = async (data: ServiceData) => {
   try {
     const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
-    const fileRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
+    const fileRef = ref(ref(storage, SERVICES_REF), data.image.filename)
     logger("log", data)
     await deleteObject(fileRef)
     await deleteDoc(serviceDataDoc)
@@ -145,9 +164,9 @@ export const updateServiceDoc = async (data: any, id: string) => {
   }
 }
 
-export const updateServiceDocImage = async (imageSrc: ImageSrc, file: Blob, data: ServiceData) => {
+export const updateServiceDocImage = async (imageSrc: Image, file: Blob, data: ServiceData) => {
   try {
-    const oldFileRef = ref(ref(storage, SERVICES_REF), data.imagesrc.filename)
+    const oldFileRef = ref(ref(storage, SERVICES_REF), data.image.filename)
     const newFileRef = ref(ref(storage, SERVICES_REF), imageSrc.filename)
     const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
 

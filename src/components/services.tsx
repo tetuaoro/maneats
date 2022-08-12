@@ -25,10 +25,10 @@ const Component = (props: Props) => {
             <Col className={`col-sm-6 ${k % 2 === 0 ? "" : "order-sm-2"}`}>
               <Image
                 className={`img-observer ${styles.transition_opacity_y_scale}`}
-                src={service.imagesrc.src}
-                alt={service.imagesrc.filename}
-                width={service.imagesrc.width}
-                height={service.imagesrc.height}
+                src={service.image.src}
+                alt={service.image.filename}
+                width={service.image.width}
+                height={service.image.height}
               />
             </Col>
             <Col>
