@@ -1,14 +1,6 @@
-export const generateArray = (start: number, end: number, step: number) => {
-  if (end <= start) return []
-  const array = [start]
-  let index = start + step
-  while (index < end) {
-    array.push(index)
-    index += step
-  }
-  array.push(end)
-  return array
-}
+import type { ServiceData } from "./firebase"
+
+export const exploitableServicesData = (data: ServiceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis(), updatedAt: d.updatedAt?.toMillis() }))
 
 type LogCall = "warn" | "log" | "err" | "info"
 export const logger = (call: LogCall, ...params: any[]) => {

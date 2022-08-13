@@ -2,10 +2,8 @@ import type { User } from "firebase/auth"
 import type { AccountData, ServiceData } from "./firebase"
 import { onAuthStateChanged, getAccount, getServices } from "./firebase"
 import { atom, selector } from "recoil"
-
-import Login from "@components/dashboard/login"
-import Account from "@components/dashboard/account"
-import { logger } from "./functions"
+import { Login, Account, Services } from "@components/dashboard/layouts"
+import { logger } from "./helpers"
 
 /* AUTHENTICATION WITH FIREBASE */
 
@@ -45,31 +43,43 @@ export const accountState = selector<AccountData | null>({
 
 /* SERVICES DATA WITH FIREBASE */
 
+const proxyServicesState = atom<ServiceData[] | null>({
+  key: "proxy-services-atom-state",
+  default: null,
+})
+
 export const servicesState = selector<ServiceData[] | null>({
   key: "services-selector-state",
   get: async ({ get }) => {
     try {
       if (!get(authState)) return null
+      const services = get(proxyServicesState)
+      if (services) return services
       return await getServices()
     } catch (error) {
       logger("err", error)
       return null
     }
   },
+  set: ({ get, set }, newState) => {
+    if (get(authState)) set(proxyServicesState, newState)
+  },
 })
 
 /* ROUTES & COMPONENTS */
 
-export type RouteType = "Account" | "Login"
-type JSXElementType = typeof Account | typeof Login
+export type RouteType = "Account" | "Login" | "Services"
+type JSXElementType = () => JSX.Element
 
 type RouteValuesType = {
   ACCOUNT: RouteType
   LOGIN: RouteType
+  SERVICES: RouteType
 }
 export const ROUTE_VALUES: RouteValuesType = {
   ACCOUNT: "Account",
   LOGIN: "Login",
+  SERVICES: "Services",
 }
 
 export const routeState = atom<RouteType | null>({
@@ -82,6 +92,10 @@ export const componentState = selector<JSXElementType>({
   get: ({ get }) => {
     if (!get(authState)) return Login
     switch (get(routeState)) {
+      case "Account":
+        return Account
+      case "Services":
+        return Services
       default:
         return Account
     }
@@ -92,8 +106,7 @@ export const componentState = selector<JSXElementType>({
 
 type ModalType = {
   text: string
-  variant?: string
-  timeout?: number
+  variant?: "success" | "danger" | "info"
 }
 
 export const modalState = atom<ModalType>({
@@ -103,11 +116,20 @@ export const modalState = atom<ModalType>({
   },
   effects: [
     ({ onSet, setSelf }) => {
-      onSet(({ timeout }) => {
+      onSet(({ variant }) => {
+        let timeout = 3200
+        switch (variant) {
+          case "danger":
+            timeout = 4300
+            break
+          case "success":
+            timeout = 3800
+            break
+        }
         const id = setTimeout(() => {
           setSelf({ text: "" })
           clearTimeout(id)
-        }, timeout || 3200)
+        }, timeout)
       })
     },
   ],

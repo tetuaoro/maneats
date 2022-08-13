@@ -1,10 +1,10 @@
 import type { NextOrObserver, User } from "firebase/auth"
-import type { DocumentData, DocumentSnapshot } from "firebase/firestore"
+import { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-import { onSnapshot, query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, Timestamp, query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
-import { logger } from "./functions"
+import { logger } from "./helpers"
 
 const firebaseConfigClientSide = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
@@ -31,8 +31,8 @@ export interface ServiceData {
   name: string
   image: Image
   description: string
-  creationdate: number
-  updatedate?: number
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
   id?: string
 }
 
@@ -43,9 +43,9 @@ export interface AccountData {
   contratType: ContratType
   organization: string
   description: string
-  creationdate: number
-  enddate?: number
-  updatedate?: number
+  createdAt: Timestamp
+  endedAt?: Timestamp
+  updatedate?: Timestamp
   id?: string
 }
 
@@ -125,38 +125,40 @@ export const getServices = async () => {
       docData["id"] = doc.id
       data.push(docData)
     })
-    return data.sort((a, b) => a.creationdate - b.creationdate)
+    return data.sort((a, b) => (a.createdAt && b.createdAt && a.createdAt.valueOf() < b.createdAt.valueOf() ? 0 : 1))
   } catch (error) {
     throw error
   }
 }
 
-export const addServiceDoc = async (data: ServiceData) => {
+export const addService = async (data: ServiceData) => {
   try {
-    return await _addDoc(collection(db, SERVICES_REF), data)
+    data = { ...data, createdAt: Timestamp.now() }
+    await _addDoc(collection(db, SERVICES_REF), data)
   } catch (error) {
     throw error
   }
 }
 
-export const removeServiceDoc = async (data: ServiceData) => {
+export const removeService = async (data: ServiceData) => {
   try {
     const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
-    const fileRef = ref(ref(storage, SERVICES_REF), data.image.filename)
-    logger("log", data)
-    await deleteObject(fileRef)
     await deleteDoc(serviceDataDoc)
+    if (data.image.src.match("https")) {
+      const fileRef = ref(storage, data.image.src)
+      await deleteObject(fileRef)
+    }
   } catch (error) {
     throw error
   }
 }
 
-export const updateServiceDoc = async (data: any, id: string) => {
+export const updateService = async (data: Partial<ServiceData>, id: string) => {
   try {
     const serviceDataDoc = doc(collection(db, SERVICES_REF), id)
     const docData = {
       ...data,
-      updatedate: Date.now(),
+      updatedAt: Timestamp.now(),
     }
     await setDoc(serviceDataDoc, docData, { merge: true })
   } catch (error) {
@@ -164,25 +166,26 @@ export const updateServiceDoc = async (data: any, id: string) => {
   }
 }
 
-export const updateServiceDocImage = async (imageSrc: Image, file: Blob, data: ServiceData) => {
+export const updateServiceImage = async (image: Image, file: Blob, data: ServiceData) => {
   try {
-    const oldFileRef = ref(ref(storage, SERVICES_REF), data.image.filename)
-    const newFileRef = ref(ref(storage, SERVICES_REF), imageSrc.filename)
+    const newFileRef = ref(ref(storage, SERVICES_REF), image.filename)
     const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
-
     const uploadTask = uploadBytesResumable(newFileRef, file)
     const { state } = await uploadTask
-    if (state === "success") {
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-      const docData = {
-        updatedate: Date.now(),
-        imagesrc: { ...imageSrc, src: downloadURL },
-      }
-      await setDoc(serviceDataDoc, docData, { merge: true })
+    if (state !== "success") throw new Error("error uploadTask !")
+    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+    const docData: Partial<ServiceData> = {
+      updatedAt: Timestamp.now(),
+      image: { ...image, src: downloadURL },
+    }
+    await setDoc(serviceDataDoc, docData, { merge: true })
+
+    if (data.image.src.match("https")) {
+      const oldFileRef = ref(storage, data.image.src)
       await deleteObject(oldFileRef)
     }
-    return state
   } catch (error) {
+    logger("err", error)
     throw error
   }
 }

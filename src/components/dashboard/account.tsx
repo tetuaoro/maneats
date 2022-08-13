@@ -1,4 +1,4 @@
-import { FormEvent, Suspense } from "react"
+import type { FormEvent } from "react"
 import type { AccountData } from "@libs/firebase"
 import { useState, useRef } from "react"
 import { Button, Card, Col, Form, Row, Placeholder } from "react-bootstrap"
@@ -70,7 +70,7 @@ const Component = () => {
   const { state, contents } = useRecoilValueLoadable(accountState)
   const account = contents as AccountData | null
   return (
-    <main className="container py-2 py-sm-4 bg-gray-300">
+    <main className="container min-vh-100 py-2 py-sm-4 bg-gray-300">
       <h1>Compte et métrics</h1>
       <PasswordComponent account={account} />
       <Row xs={1} sm={2} md={3} className="g-4 pt-5">
@@ -101,11 +101,12 @@ const Component = () => {
         <Col>
           <Card className="shadow">
             <Card.Body>
-              <Card.Title className="h6">Début/Fin du contrat</Card.Title>
+              <Card.Title className="h6">Début | Fin du contrat</Card.Title>
               {state === "hasValue" ? (
                 <Card.Text>
-                  {account && account.creationdate ? new Date(account.creationdate).toLocaleString() : "indéterminé"} /
-                  {account && account.enddate ? new Date(account.enddate).toLocaleString() : "indéterminé"}
+                  {account && account.createdAt ? account.createdAt.toDate().toLocaleDateString() : "indéterminé"}
+                  {" | "}
+                  {account && account.endedAt ? account.endedAt.toDate().toLocaleDateString() : "indéterminé"}
                 </Card.Text>
               ) : (
                 <Placeholder as={Card.Text} animation="glow">

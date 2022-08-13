@@ -24,12 +24,12 @@ const Component = () => {
       }
       await loginWithEmail(email.value, password.value)
     } catch (error) {
-      setModal({ text: "Le nom d'utilisateur ou le mot de passe est erroné !", timeout: 4200, variant: "danger" })
+      setModal({ text: "Le nom d'utilisateur ou le mot de passe est erroné !", variant: "danger" })
     }
   }
 
   return (
-    <main className="container py-2 py-sm-4 bg-gray-300">
+    <main className="container min-vh-100 py-2 py-sm-4 bg-gray-300">
       <h1>Se connecter</h1>
       <Row>
         <Col></Col>

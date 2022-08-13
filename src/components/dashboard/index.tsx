@@ -1,5 +1,4 @@
-// import type { PropsWithChildren } from "react"
-import type { MouseEvent } from "react"
+import type { RouteType } from "@libs/atoms"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { Alert, Container, Modal, Nav, Navbar, Offcanvas, Button } from "react-bootstrap"
@@ -18,7 +17,7 @@ const LoginBtn = () => {
     try {
       auth && (await signOutMe())
     } catch (error) {
-      setModal({ text: "Une erreur est survenue !", timeout: 4200, variant: "danger" })
+      setModal({ text: "Une erreur est survenue !", variant: "danger" })
     }
   }
   return (
@@ -30,12 +29,7 @@ const LoginBtn = () => {
 
 const Navs = () => {
   const setRoute = useSetRecoilState(routeState)
-
-  const handleClick = (e: MouseEvent<HTMLLinkElement>) => {
-    e.preventDefault()
-    const { id } = e.target as any
-    setRoute(id)
-  }
+  const handleClick = (id: RouteType) => setRoute(id)
 
   return (
     <>
@@ -43,17 +37,17 @@ const Navs = () => {
         <LoginBtn />
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link onClick={handleClick} id={ROUTE_VALUES.ACCOUNT} className="py-sm-3">
+        <Nav.Link href="#compte" onClick={() => handleClick(ROUTE_VALUES.ACCOUNT)} className="py-sm-3">
           Compte
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link onClick={handleClick} id={ROUTE_VALUES.ACCOUNT} className="py-sm-3">
+        <Nav.Link href="#services" onClick={() => handleClick(ROUTE_VALUES.SERVICES)} className="py-sm-3">
           Services
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link onClick={handleClick} id={ROUTE_VALUES.ACCOUNT} className="py-sm-3">
+        <Nav.Link href="#bills" onClick={() => handleClick(ROUTE_VALUES.ACCOUNT)} className="py-sm-3">
           Devis/Factures
         </Nav.Link>
       </Nav.Item>
@@ -71,7 +65,7 @@ const Navigation = () => {
           </Navbar.Brand>
         </Link>
         <Navbar.Toggle aria-controls="offcanvasNavbar" />
-        <NavbarOffcanvas id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <NavbarOffcanvas className="text-bg-dark" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
           <Offcanvas.Header closeButton>
             <Offcanvas.Title id="offcanvasNavbarLabel" className="fs-1">
               Menu
@@ -89,8 +83,7 @@ const Navigation = () => {
 }
 
 const Component = () => {
-  const { text, variant } = useRecoilValue(modalState)
-  const ComponentState = useRecoilValue(componentState)
+  const [{ text, variant }, ComponentState] = [useRecoilValue(modalState), useRecoilValue(componentState)]
 
   const onEnter = () => {
     const navbar: HTMLElement | null = document.querySelector(".navbar")

@@ -4,10 +4,10 @@ import { Workbox } from "workbox-window"
 import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
-import ServiceLayout from "@components/services"
-import EstimateLayout from "@components/estimates"
-import { logger } from "@libs/functions"
+import ServiceLayout from "@components/home/services"
+import EstimateLayout from "@components/home/estimates"
 import { getServices } from "@libs/firebase"
+import { exploitableServicesData, logger } from "@libs/helpers"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -97,7 +97,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 
 export const getStaticProps = async () => {
   try {
-    const data = await getServices()
+    const data = exploitableServicesData(await getServices())
     return { props: { services: data }, revalidate: 60 }
   } catch (error) {
     logger("err", error)
