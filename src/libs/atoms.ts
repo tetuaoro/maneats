@@ -1,8 +1,8 @@
 import type { User } from "firebase/auth"
-import type { AccountData, ServiceData } from "./firebase"
-import { onAuthStateChanged, getAccount, getServices } from "./firebase"
+import type { AccountData, ServiceData, PriceData } from "./firebase"
+import { onAuthStateChanged, getAccount, getServices, getPrices } from "./firebase"
 import { atom, selector } from "recoil"
-import { Login, Account, Services } from "@components/dashboard/layouts"
+import { Login, Account, Services, Prices } from "@components/dashboard/layouts"
 import { logger } from "./helpers"
 
 /* AUTHENTICATION WITH FIREBASE */
@@ -66,20 +66,47 @@ export const servicesState = selector<ServiceData[] | null>({
   },
 })
 
+/* PRICES DATA WITH FIREBASE */
+
+const proxyPricesState = atom<PriceData[] | null>({
+  key: "proxy-prices-atom-state",
+  default: null,
+})
+
+export const pricesState = selector<PriceData[] | null>({
+  key: "prices-selector-state",
+  get: async ({ get }) => {
+    try {
+      if (!get(authState)) return null
+      const prices = get(proxyPricesState)
+      if (prices) return prices
+      return await getPrices()
+    } catch (error) {
+      logger("err", error)
+      return null
+    }
+  },
+  set: ({ get, set }, newState) => {
+    if (get(authState)) set(proxyPricesState, newState)
+  },
+})
+
 /* ROUTES & COMPONENTS */
 
-export type RouteType = "Account" | "Login" | "Services"
+export type RouteType = "Account" | "Login" | "Services" | "Tarifs"
 type JSXElementType = () => JSX.Element
 
 type RouteValuesType = {
   ACCOUNT: RouteType
   LOGIN: RouteType
   SERVICES: RouteType
+  TARIFS: RouteType
 }
 export const ROUTE_VALUES: RouteValuesType = {
   ACCOUNT: "Account",
   LOGIN: "Login",
   SERVICES: "Services",
+  TARIFS: "Tarifs",
 }
 
 export const routeState = atom<RouteType | null>({
@@ -96,6 +123,8 @@ export const componentState = selector<JSXElementType>({
         return Account
       case "Services":
         return Services
+      case "Tarifs":
+        return Prices
       default:
         return Account
     }

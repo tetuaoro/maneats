@@ -1,7 +1,7 @@
 import type { NextOrObserver, User } from "firebase/auth"
 import { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-import { onSnapshot, Timestamp, query, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, Timestamp, query, orderBy, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./helpers"
@@ -21,6 +21,19 @@ const db = getFirestore(app)
 const storage = getStorage(app)
 const auth = initializeAuth(app, { persistence: browserLocalPersistence })
 
+type ContractType = "free" | "premium"
+export interface AccountData {
+  name: string
+  email: string
+  contractType: ContractType
+  organization: string
+  description: string
+  createdAt: Timestamp
+  endedAt?: Timestamp
+  updatedate?: Timestamp
+  id?: string
+}
+
 export interface Image {
   filename: string
   src: string
@@ -36,21 +49,25 @@ export interface ServiceData {
   id?: string
 }
 
-type ContratType = "free" | "premium"
-export interface AccountData {
-  name: string
-  email: string
-  contratType: ContratType
-  organization: string
-  description: string
-  createdAt: Timestamp
-  endedAt?: Timestamp
-  updatedate?: Timestamp
+type CurrencyType = "XPF" | "EUR" | "USD"
+export interface PriceData {
   id?: string
+  group: string
+  name: string
+  description: string
+  currency: CurrencyType
+  price: number
+  extraPrice?: number
+  promotion?: number
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
 }
 
-export const SERVICES_REF = "services"
 export const ACCOUNT_REF = "account"
+export const SERVICES_REF = "services"
+export const PRICES_REF = "prices"
+
+/* ACCOUNT */
 
 export const signOutMe = async () => {
   try {
@@ -106,13 +123,7 @@ export const getAccount = async () => {
   }
 }
 
-export const addAccount = async (data: AccountData) => {
-  try {
-    return await _addDoc(collection(db, ACCOUNT_REF), data)
-  } catch (error) {
-    throw error
-  }
-}
+/* SERVICES */
 
 export const getServices = async () => {
   try {
@@ -186,6 +197,43 @@ export const updateServiceImage = async (image: Image, file: Blob, data: Service
     }
   } catch (error) {
     logger("err", error)
+    throw error
+  }
+}
+
+/* PRICES */
+
+export const getPrices = async () => {
+  try {
+    const q = query(collection(db, PRICES_REF), orderBy("group"))
+    const docsSnap = await _getDocs(q)
+    if (docsSnap.empty) throw new Error("prices empty !")
+    const data: PriceData[] = []
+    docsSnap.forEach((doc) => {
+      const docData = doc.data() as PriceData
+      docData["id"] = doc.id
+      data.push(docData)
+    })
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const addPrice = async (data: PriceData) => {
+  try {
+    data = { ...data, createdAt: Timestamp.now() }
+    await _addDoc(collection(db, PRICES_REF), data)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const removePrice = async (data: PriceData) => {
+  try {
+    const serviceDataDoc = doc(collection(db, PRICES_REF), data.id)
+    await deleteDoc(serviceDataDoc)
+  } catch (error) {
     throw error
   }
 }

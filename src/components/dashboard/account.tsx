@@ -60,9 +60,14 @@ const PasswordComponent = (props: PasswordComponentProps) => {
 
 const PlaceholderText = () => {
   return (
-    <Placeholder as={Card.Text} animation="glow">
-      <Placeholder xs={12} />
-    </Placeholder>
+    <>
+      <Placeholder as={Card.Title} animation="glow">
+        <Placeholder xs={10} />
+      </Placeholder>
+      <Placeholder as={Card.Text} animation="glow">
+        <Placeholder xs={5} /> <Placeholder xs={6} />
+      </Placeholder>
+    </>
   )
 }
 
@@ -74,48 +79,47 @@ const Component = () => {
       <h1>Compte et métrics</h1>
       <PasswordComponent account={account} />
       <Row xs={1} sm={2} md={3} className="g-4 pt-5">
-        <Col>
-          <Card className="shadow">
-            <Card.Body>
-              <Card.Title className="h6">Nom</Card.Title>
-              {state === "hasValue" ? <Card.Text>{account?.name}</Card.Text> : <PlaceholderText />}
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="shadow">
-            <Card.Body>
-              <Card.Title className="h6">Description</Card.Title>
-              {state === "hasValue" ? <Card.Text>{account?.description}</Card.Text> : <PlaceholderText />}
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="shadow">
-            <Card.Body>
-              <Card.Title className="h6">Type de contrat</Card.Title>
-              {state === "hasValue" ? <Card.Text>{account?.contratType}</Card.Text> : <PlaceholderText />}
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col>
-          <Card className="shadow">
-            <Card.Body>
-              <Card.Title className="h6">Début | Fin du contrat</Card.Title>
-              {state === "hasValue" ? (
-                <Card.Text>
-                  {account && account.createdAt ? account.createdAt.toDate().toLocaleDateString() : "indéterminé"}
-                  {" | "}
-                  {account && account.endedAt ? account.endedAt.toDate().toLocaleDateString() : "indéterminé"}
-                </Card.Text>
-              ) : (
-                <Placeholder as={Card.Text} animation="glow">
-                  <Placeholder xs={5} /> / <Placeholder xs={6} />
-                </Placeholder>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
+        {state !== "hasValue" && <PlaceholderText />}
+        {state === "hasValue" && (
+          <>
+            <Col>
+              <Card className="shadow">
+                <Card.Body>
+                  <Card.Title className="h6">Nom</Card.Title>
+                  <Card.Text>{account?.name}</Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col>
+              <Card className="shadow">
+                <Card.Body>
+                  <Card.Title className="h6">Description</Card.Title>
+                  <Card.Text>{account?.description}</Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col>
+              <Card className="shadow">
+                <Card.Body>
+                  <Card.Title className="h6">Type de contrat</Card.Title>
+                  <Card.Text>{account?.contractType}</Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col>
+              <Card className="shadow">
+                <Card.Body>
+                  <Card.Title className="h6">Début | Fin du contrat</Card.Title>
+                  <Card.Text>
+                    {account && account.createdAt ? account.createdAt.toDate().toLocaleDateString() : "indéterminé"}
+                    {" | "}
+                    {account && account.endedAt ? account.endedAt.toDate().toLocaleDateString() : "indéterminé"}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          </>
+        )}
       </Row>
     </main>
   )

@@ -47,6 +47,11 @@ const Navs = () => {
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
+        <Nav.Link href="#prices" onClick={() => handleClick(ROUTE_VALUES.TARIFS)} className="py-sm-3">
+          Tarifs
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item as="li">
         <Nav.Link href="#bills" onClick={() => handleClick(ROUTE_VALUES.ACCOUNT)} className="py-sm-3">
           Devis/Factures
         </Nav.Link>
