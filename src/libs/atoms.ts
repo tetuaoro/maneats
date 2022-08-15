@@ -93,20 +93,20 @@ export const pricesState = selector<PriceData[] | null>({
 
 /* ROUTES & COMPONENTS */
 
-export type RouteType = "Account" | "Login" | "Services" | "Tarifs"
+export type RouteType = "Account" | "Login" | "Services" | "Prices"
 type JSXElementType = () => JSX.Element
 
-type RouteValuesType = {
+type RouteFieldType = {
   ACCOUNT: RouteType
   LOGIN: RouteType
   SERVICES: RouteType
-  TARIFS: RouteType
+  PRICES: RouteType
 }
-export const ROUTE_VALUES: RouteValuesType = {
+export const RouteField: RouteFieldType = {
   ACCOUNT: "Account",
   LOGIN: "Login",
   SERVICES: "Services",
-  TARIFS: "Tarifs",
+  PRICES: "Prices",
 }
 
 export const routeState = atom<RouteType | null>({
@@ -123,7 +123,7 @@ export const componentState = selector<JSXElementType>({
         return Account
       case "Services":
         return Services
-      case "Tarifs":
+      case "Prices":
         return Prices
       default:
         return Account

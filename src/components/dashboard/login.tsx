@@ -10,7 +10,6 @@ const Component = () => {
   const passwordRef = useRef<HTMLInputElement | null>(null)
   const [validated, setValidated] = useState(false)
 
-  const setAuth = useSetRecoilState(authState)
   const setModal = useSetRecoilState(modalState)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -20,7 +19,7 @@ const Component = () => {
       const { current: password } = passwordRef
       if (!email || !password || !e.currentTarget.checkValidity()) {
         setValidated(true)
-        throw "no valid"
+        throw "no valid !"
       }
       await loginWithEmail(email.value, password.value)
     } catch (error) {
@@ -38,15 +37,13 @@ const Component = () => {
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Addresse email</Form.Label>
               <Form.Control ref={emailRef} type="email" placeholder="mon@email.com" required />
-              <Form.Control.Feedback type="invalid">The email could be incorrect, please provide a valid email.</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{"L'identifiant est peut-être erroné !"}</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
               <Form.Label>Mot de passe</Form.Label>
               <Form.Control ref={passwordRef} type="password" placeholder="mon mot de passe" required />
-              <Form.Control.Feedback type="invalid">
-                The password could be incorrect, please provide a valid password. At least 8 characters of 2 numbers, 2 uppercases, 3 lowercases and one special character.
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{"Le mot de passe est peut-être erroné !"}</Form.Control.Feedback>
             </Form.Group>
             <Button variant="info" type="submit">
               Connexion

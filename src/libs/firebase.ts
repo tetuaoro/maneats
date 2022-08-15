@@ -49,11 +49,16 @@ export interface ServiceData {
   id?: string
 }
 
-type CurrencyType = "XPF" | "EUR" | "USD"
+export type CurrencyType = "XPF" | "EUR" | "USD"
+type CurrencyFieldType = {
+  XPF: CurrencyType
+  EUR: CurrencyType
+  USD: CurrencyType
+}
+export const CurrencyField: CurrencyFieldType = { XPF: "XPF", EUR: "EUR", USD: "USD" }
 export interface PriceData {
   id?: string
   group: string
-  name: string
   description: string
   currency: CurrencyType
   price: number

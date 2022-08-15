@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 import { Alert, Container, Modal, Nav, Navbar, Offcanvas, Button } from "react-bootstrap"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { sitename } from "@libs/app"
-import { modalState, authState, routeState, ROUTE_VALUES, componentState } from "@libs/atoms"
+import { modalState, authState, routeState, RouteField, componentState } from "@libs/atoms"
 import { signOutMe } from "@libs/firebase"
 
 const NavbarOffcanvas = dynamic(() => import("react-bootstrap/NavbarOffcanvas"), { ssr: false })
@@ -37,22 +37,22 @@ const Navs = () => {
         <LoginBtn />
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link href="#compte" onClick={() => handleClick(ROUTE_VALUES.ACCOUNT)} className="py-sm-3">
+        <Nav.Link href="#compte" onClick={() => handleClick(RouteField.ACCOUNT)} className="py-sm-3">
           Compte
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link href="#services" onClick={() => handleClick(ROUTE_VALUES.SERVICES)} className="py-sm-3">
+        <Nav.Link href="#services" onClick={() => handleClick(RouteField.SERVICES)} className="py-sm-3">
           Services
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link href="#prices" onClick={() => handleClick(ROUTE_VALUES.TARIFS)} className="py-sm-3">
+        <Nav.Link href="#prices" onClick={() => handleClick(RouteField.PRICES)} className="py-sm-3">
           Tarifs
         </Nav.Link>
       </Nav.Item>
       <Nav.Item as="li">
-        <Nav.Link href="#bills" onClick={() => handleClick(ROUTE_VALUES.ACCOUNT)} className="py-sm-3">
+        <Nav.Link href="#bills" onClick={() => handleClick(RouteField.ACCOUNT)} className="py-sm-3">
           Devis/Factures
         </Nav.Link>
       </Nav.Item>
@@ -100,9 +100,9 @@ const Component = () => {
 
   return (
     <>
-      <Modal show={text.length > 0 ? true : false} backdrop={false} dialogClassName="fixed-bottom" onEnter={onEnter}>
+      <Modal backdropClassName="opacity-0" show={text.length > 0 ? true : false} backdrop={false} dialogClassName="fixed-bottom" onEnter={onEnter}>
         <Modal.Body className="p-0">
-          <Alert className="m-0" variant={variant}>
+          <Alert className="m-0" variant={variant || "info"}>
             {text}
           </Alert>
         </Modal.Body>
