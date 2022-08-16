@@ -28,7 +28,7 @@ const Component = () => {
   }
 
   return (
-    <main className="container min-vh-100 py-2 py-sm-4 bg-gray-300">
+    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
       <h1>Se connecter</h1>
       <Row>
         <Col></Col>

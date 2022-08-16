@@ -1,0 +1,7 @@
+.contentEditableSpan:not(:empty):before {
+  content: attr(data-content-before);
+}
+
+.contentEditableSpan:not(:empty):after {
+  content: " " attr(data-content-after);
+}

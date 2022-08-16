@@ -1,4 +1,3 @@
-import type { RouteType } from "@libs/atoms"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { Alert, Container, Modal, Nav, Navbar, Offcanvas, Button } from "react-bootstrap"
@@ -6,6 +5,10 @@ import { useRecoilValue, useSetRecoilState } from "recoil"
 import { sitename } from "@libs/app"
 import { modalState, authState, routeState, RouteField, componentState } from "@libs/atoms"
 import { signOutMe } from "@libs/firebase"
+
+import type { RouteType } from "@libs/atoms"
+
+import styles from "@styles/Dashboard.module.scss"
 
 const NavbarOffcanvas = dynamic(() => import("react-bootstrap/NavbarOffcanvas"), { ssr: false })
 
@@ -62,7 +65,7 @@ const Navs = () => {
 
 const Navigation = () => {
   return (
-    <Navbar sticky="top" bg="dark" variant="dark" expand="sm" collapseOnSelect className="vh-sm-100 align-items-sm-start">
+    <Navbar sticky="top" bg="dark" variant="dark" expand="sm" collapseOnSelect className="align-items-sm-start">
       <Container fluid className="flex-sm-column">
         <Link href="/">
           <Navbar.Brand href="/" className="mb-sm-5">
@@ -92,15 +95,20 @@ const Component = () => {
 
   const onEnter = () => {
     const navbar: HTMLElement | null = document.querySelector(".navbar")
+    const body: HTMLElement | null = document.querySelector("body")
     if (navbar) {
-      navbar.style.paddingRight = "0px"
-      navbar.style.marginRight = "0px"
+      navbar.style.paddingRight = ""
+      navbar.style.marginRight = ""
+    }
+    if (body) {
+      body.style.overflow = ""
+      body.style.paddingRight = ""
     }
   }
 
   return (
     <>
-      <Modal backdropClassName="opacity-0" show={text.length > 0 ? true : false} backdrop={false} dialogClassName="fixed-bottom" onEnter={onEnter}>
+      <Modal backdropClassName={`${styles.modalBackdrop}`} className={styles.modal} show={text.length > 0 ? true : false} dialogClassName="fixed-bottom" onEnter={onEnter}>
         <Modal.Body className="p-0">
           <Alert className="m-0" variant={variant || "info"}>
             {text}

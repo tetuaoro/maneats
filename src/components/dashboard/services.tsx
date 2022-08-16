@@ -1,10 +1,12 @@
-import type { Image, ServiceData } from "@libs/firebase"
 import { Button, Card, Col, Row } from "react-bootstrap"
 import NextImage from "next/image"
 import { getServices, addService as _addService, updateServiceImage, updateService, removeService as _removeService } from "@libs/firebase"
-import { useRecoilValueLoadable, useSetRecoilState, useRecoilStateLoadable } from "recoil"
+import { useSetRecoilState, useRecoilStateLoadable } from "recoil"
 import { modalState, servicesState } from "@libs/atoms"
 import { logger } from "@libs/helpers"
+
+import type { Image, ServiceData } from "@libs/firebase"
+import type { KeyboardEvent, MouseEvent } from "react"
 
 import styles from "@styles/Service.module.scss"
 
@@ -59,21 +61,6 @@ const Component = () => {
     }
   }
 
-  const handleChange = async (e: any, id?: string) => {
-    try {
-      if (!id) throw new Error("Pas d'identifiant !")
-      const text: string = e.target.innerText
-      const key: string = e.target.id
-      if (text.length < 5) throw new Error("Doit contenir au moins 5 lettres !")
-      const data = { [key]: text }
-      await updateService(data, id)
-    } catch (error) {
-      logger("err", error)
-      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
-      else setModal({ text: "Une erreur est survenue !", variant: "danger" })
-    }
-  }
-
   const addService = async () => {
     try {
       const newservice: ServiceData = {
@@ -109,8 +96,31 @@ const Component = () => {
     }
   }
 
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === "Escape") {
+      e.preventDefault()
+      e.target.setAttribute("contenteditable", "false")
+    }
+  }
+
+  const onBlur = async (e: any, id?: string) => {
+    try {
+      if (!id) throw new Error("Pas d'identifiant !")
+      const text: string = e.target.innerText
+      const key: string = e.target.id
+      if (text.length < 5) throw new Error("Doit contenir au moins 5 lettres !")
+      const data = { [key]: text }
+      await updateService(data, id)
+      document.querySelectorAll("[contenteditable='false']").forEach((e) => e.setAttribute("contenteditable", "true"))
+    } catch (error) {
+      logger("err", error)
+      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
+      else setModal({ text: "Une erreur est survenue !", variant: "danger" })
+    }
+  }
+
   return (
-    <main className="container min-vh-100 py-2 py-sm-4 bg-gray-300">
+    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
       <h1>Services</h1>
       <Button variant="dark" onClick={addService}>
         Ajouter un service
@@ -120,15 +130,29 @@ const Component = () => {
           {services.map((service, k) => (
             <Col key={k}>
               <Card className="shadow">
-                <label htmlFor={`for-card-img-${k}`}>
+                <label className={styles.cardLabelForm} htmlFor={`for-card-img-${k}`}>
                   <NextImage className={`card-img-top ${styles.cardImgForm}`} alt={service.name} width={service.image.width} height={service.image.height} src={service.image.src} />
                 </label>
                 <input onChange={(e) => handleImg(e, service.id)} className="d-none" accept="image/*" id={`for-card-img-${k}`} type="file" />
                 <Card.Body>
-                  <Card.Title contentEditable suppressContentEditableWarning id="name" onBlur={(e: any) => handleChange(e, service.id)}>
+                  <Card.Title
+                    id="name"
+                    className={`p-1 p-sm-2 ${styles.contentEditable}`}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onKeyDown={onKeyDown}
+                    onBlur={(e: any) => onBlur(e, service.id)}
+                  >
                     {service.name}
                   </Card.Title>
-                  <Card.Text contentEditable suppressContentEditableWarning id="description" onBlur={(e: any) => handleChange(e, service.id)}>
+                  <Card.Text
+                    id="description"
+                    className={`p-1 p-sm-2 ${styles.contentEditable}`}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onKeyDown={onKeyDown}
+                    onBlur={(e: any) => onBlur(e, service.id)}
+                  >
                     {service.description}
                   </Card.Text>
                 </Card.Body>
@@ -147,9 +171,9 @@ const Component = () => {
         <Card className="mt-5 shadow">
           <Card.Body>
             <span>Aucun service. </span>
-            <a href="#" onClick={addService} className="link-info">
+            <span onClick={addService} className="link-info">
               Ajouter en un
-            </a>
+            </span>
           </Card.Body>
         </Card>
       )}

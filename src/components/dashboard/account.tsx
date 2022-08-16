@@ -75,7 +75,7 @@ const Component = () => {
   const { state, contents } = useRecoilValueLoadable(accountState)
   const account = contents as AccountData | null
   return (
-    <main className="container min-vh-100 py-2 py-sm-4 bg-gray-300">
+    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
       <h1>Compte et métrics</h1>
       <PasswordComponent account={account} />
       <Row xs={1} sm={2} md={3} className="g-4 pt-5">
