@@ -8,7 +8,7 @@ import { logger } from "@libs/helpers"
 import type { Image, ServiceData } from "@libs/firebase"
 import type { KeyboardEvent, MouseEvent } from "react"
 
-import styles from "@styles/Service.module.scss"
+import styles from "@styles/Services.module.scss"
 
 const Component = () => {
   const [{ state, contents }, setServiceData] = useRecoilStateLoadable(servicesState)

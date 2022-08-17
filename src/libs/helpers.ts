@@ -9,3 +9,13 @@ export const logger = (call: LogCall, ...params: any[]) => {
   call === "info" && console.info(new Date().toString(), ...params)
   call === "warn" && console.warn(new Date().toString(), ...params)
 }
+
+export const parseIntWithThrow = (value: string) => {
+  try {
+    const result = parseInt(value, 10)
+    if (isNaN(result)) throw new Error("NaN")
+    return result
+  } catch (error) {
+    throw error
+  }
+}

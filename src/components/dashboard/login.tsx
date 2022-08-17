@@ -1,9 +1,10 @@
-import type { FormEvent } from "react"
 import { Button, Col, Form, Row } from "react-bootstrap"
 import { useRef, useState } from "react"
 import { useSetRecoilState } from "recoil"
-import { modalState, authState } from "@libs/atoms"
+import { modalState } from "@libs/atoms"
 import { loginWithEmail } from "@libs/firebase"
+
+import type { FormEvent } from "react"
 
 const Component = () => {
   const emailRef = useRef<HTMLInputElement | null>(null)

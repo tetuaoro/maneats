@@ -1,14 +1,14 @@
 import { useState, useRef, useContext, createContext } from "react"
 import { Button, Form, Modal, Placeholder, Table } from "react-bootstrap"
 import { useRecoilStateLoadable, useSetRecoilState } from "recoil"
-import { addPrice as _addPrice, getPrices, removePrice as _removePrice, CurrencyField } from "@libs/firebase"
-import { logger } from "@libs/helpers"
+import { addPrice as _addPrice, getPrices, removePrice as _removePrice, updatePrice } from "@libs/firebase"
+import { logger, parseIntWithThrow } from "@libs/helpers"
 import { modalState, pricesState } from "@libs/atoms"
 
-import type { FormEvent, Dispatch, SetStateAction, PropsWithChildren } from "react"
-import type { PriceData, CurrencyType } from "@libs/firebase"
+import type { FormEvent, Dispatch, SetStateAction, KeyboardEvent, PropsWithChildren, MouseEvent, FocusEvent } from "react"
+import type { PriceData } from "@libs/firebase"
 
-import styles from "@styles/Price.module.scss"
+import styles from "@styles/Prices.module.scss"
 
 type ModalContextType = {
   show: boolean
@@ -47,11 +47,10 @@ const MyModal = (props: PropsWithChildren) => {
       const group = form.querySelector<HTMLInputElement>("[name=group]")?.value
       const description = form.querySelector<HTMLInputElement>("[name=description]")?.value
       const price = form.querySelector<HTMLInputElement>("[name=price]")?.value
-      const currency = form.querySelector<HTMLSelectElement>("[name=currency]")?.value as CurrencyType | undefined
       const extraPrice = form.querySelector<HTMLInputElement>("[name=extraPrice]")?.value
       const promotion = form.querySelector<HTMLInputElement>("[name=promotion]")?.value
 
-      if (!group || !description || !price || !currency) throw new Error("no valid data !")
+      if (!group || !description || !price) throw new Error("no valid data !")
       const stringToNumber = (str: string) => {
         try {
           if (!str || str.length === 0) throw "err"
@@ -64,7 +63,6 @@ const MyModal = (props: PropsWithChildren) => {
         group,
         description,
         price: stringToNumber(price),
-        currency,
       }
 
       if (extraPrice && stringToNumber(extraPrice) > 0) data["extraPrice"] = stringToNumber(extraPrice)
@@ -120,19 +118,6 @@ const MyModal = (props: PropsWithChildren) => {
                 {"Le prix doit être plus grand ou égal à 0 (0 par défault)."}
               </Form.Text>
               <Form.Control.Feedback type="invalid">Ce champ est requis et doit être positif !</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="currency">
-              <Form.Label>Devise</Form.Label>
-              <Form.Select name="currency" required defaultValue={CurrencyField.XPF}>
-                {Object.values(CurrencyField).map((currency, k) => (
-                  <option key={k} value={currency}>
-                    {currency}
-                  </option>
-                ))}
-              </Form.Select>
-              <Form.Text id="currencyHelpBlock" muted>
-                {"(XPF par défault)."}
-              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="extraPrice">
               <Form.Label>Prix extra</Form.Label>
@@ -190,8 +175,42 @@ const MyTable = () => {
     }
   }
 
+  const onBlur = async (e: FocusEvent<HTMLInputElement>, id?: string) => {
+    try {
+      if (!id) throw new Error("Pas d'identifiant !")
+      const { value, type, name } = e.target
+      let data: { [key: string]: any } = {}
+      if (type === "number") data[name] = parseIntWithThrow(value)
+      else data[name] = value
+      await updatePrice(data, id)
+      await updatePriceDataState()
+    } catch (error) {
+      logger("err", error)
+      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
+      else setModal({ text: "Une erreur est survenue !", variant: "danger" })
+    }
+  }
+
+  const onClick = (e: MouseEvent<HTMLTableCellElement>) => {
+    const target = e.target as Element
+    target.querySelector("input")?.focus()
+  }
+
+  const onInput = (e: FormEvent<HTMLTextAreaElement>) => {
+    const target = e.target as HTMLElement
+    target.style.height = "auto"
+    target.style.height = target.scrollHeight + "px"
+  }
+
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
   return (
-    <Table bordered hover responsive="sm" className="mt-5">
+    <Table bordered hover responsive="sm" className="mt-5 caption-top">
       <thead>
         <tr>
           <th className="text-nowrap">Action</th>
@@ -227,7 +246,7 @@ const MyTable = () => {
         )}
         {state === "hasValue" &&
           prices &&
-          prices.map(({ id, group, description, price, currency, extraPrice, promotion }, k) => (
+          prices.map(({ id, group, description, price, extraPrice, promotion }, k) => (
             <tr key={k}>
               <td>
                 <Button size="sm" variant="danger" onClick={() => removePrice(id)}>
@@ -236,20 +255,20 @@ const MyTable = () => {
                   </svg>
                 </Button>
               </td>
-              <td className="text-nowrap" contentEditable suppressContentEditableWarning>
-                {group}
+              <td onClick={onClick} className={styles.cell}>
+                <textarea onKeyDown={onKeyDown} onInput={onInput} onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={group} name="group" />
               </td>
-              <td className="text-nowrap" contentEditable suppressContentEditableWarning>
-                {description}
+              <td onClick={onClick} className={styles.cell}>
+                <textarea onKeyDown={onKeyDown} onInput={onInput} onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={description} name="description" />
               </td>
-              <td className={`text-nowrap ${styles.contentEditableSpan}`} data-content-after={`${currency}`} contentEditable suppressContentEditableWarning>
-                {price}
+              <td>
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={price && price > 0 ? price : ""} name="price" min="0" type="number" />
               </td>
-              <td className={`text-nowrap text-danger ${styles.contentEditableSpan}`} data-content-before="+" data-content-after={`${currency}`} contentEditable suppressContentEditableWarning>
-                {extraPrice ? extraPrice : ""}
+              <td>
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={extraPrice && extraPrice > 0 ? extraPrice : ""} name="extraPrice" min="0" type="number" />
               </td>
-              <td className={`text-nowrap text-info ${styles.contentEditableSpan}`} data-content-before="-" data-content-after={`${currency}`} contentEditable suppressContentEditableWarning>
-                {promotion ? promotion : ""}
+              <td>
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={promotion && promotion > 0 ? promotion : ""} name="promotion" min="0" type="number" />
               </td>
             </tr>
           ))}

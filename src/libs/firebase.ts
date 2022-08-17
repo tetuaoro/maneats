@@ -60,7 +60,6 @@ export interface PriceData {
   id?: string
   group: string
   description: string
-  currency: CurrencyType
   price: number
   extraPrice?: number
   promotion?: number
@@ -238,6 +237,19 @@ export const removePrice = async (data: PriceData) => {
   try {
     const serviceDataDoc = doc(collection(db, PRICES_REF), data.id)
     await deleteDoc(serviceDataDoc)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updatePrice = async (data: Partial<PriceData>, id: string) => {
+  try {
+    const priceDoc = doc(collection(db, PRICES_REF), id)
+    const docData = {
+      ...data,
+      updatedAt: Timestamp.now(),
+    }
+    await setDoc(priceDoc, docData, { merge: true })
   } catch (error) {
     throw error
   }
