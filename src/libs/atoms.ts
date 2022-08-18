@@ -1,9 +1,11 @@
-import type { User } from "firebase/auth"
-import type { AccountData, ServiceData, PriceData } from "./firebase"
 import { onAuthStateChanged, getAccount, getServices, getPrices } from "./firebase"
 import { atom, selector } from "recoil"
-import { Login, Account, Services, Prices } from "@components/dashboard/layouts"
+import { Login, Account, Services, Prices, Bills } from "@components/dashboard/layouts"
 import { logger } from "./helpers"
+
+import type { ComponentType } from "react"
+import type { User } from "firebase/auth"
+import type { AccountData, ServiceData, PriceData } from "./firebase"
 
 /* AUTHENTICATION WITH FIREBASE */
 
@@ -93,7 +95,7 @@ export const pricesState = selector<PriceData[] | null>({
 
 /* ROUTES & COMPONENTS */
 
-export type RouteType = "Account" | "Login" | "Services" | "Prices"
+export type RouteType = "Account" | "Login" | "Services" | "Prices" | "Bills"
 type JSXElementType = () => JSX.Element
 
 type RouteFieldType = {
@@ -101,12 +103,14 @@ type RouteFieldType = {
   LOGIN: RouteType
   SERVICES: RouteType
   PRICES: RouteType
+  BILLS: RouteType
 }
 export const RouteField: RouteFieldType = {
   ACCOUNT: "Account",
   LOGIN: "Login",
   SERVICES: "Services",
   PRICES: "Prices",
+  BILLS: "Bills",
 }
 
 export const routeState = atom<RouteType | null>({
@@ -114,7 +118,7 @@ export const routeState = atom<RouteType | null>({
   default: null,
 })
 
-export const componentState = selector<JSXElementType>({
+export const componentState = selector<JSXElementType | ComponentType<{}>>({
   key: "component-selector-state",
   get: ({ get }) => {
     if (!get(authState)) return Login
@@ -125,6 +129,8 @@ export const componentState = selector<JSXElementType>({
         return Services
       case "Prices":
         return Prices
+      case "Bills":
+        return Bills
       default:
         return Account
     }

@@ -51,22 +51,14 @@ const MyModal = (props: PropsWithChildren) => {
       const promotion = form.querySelector<HTMLInputElement>("[name=promotion]")?.value
 
       if (!group || !description || !price) throw new Error("no valid data !")
-      const stringToNumber = (str: string) => {
-        try {
-          if (!str || str.length === 0) throw "err"
-          return parseInt(str)
-        } catch (error) {
-          return 0
-        }
-      }
       let data: PriceData = {
         group,
         description,
-        price: stringToNumber(price),
+        price: parseIntWithThrow(price),
       }
 
-      if (extraPrice && stringToNumber(extraPrice) > 0) data["extraPrice"] = stringToNumber(extraPrice)
-      if (promotion && stringToNumber(promotion) > 0) data["promotion"] = stringToNumber(promotion)
+      if (extraPrice && parseIntWithThrow(extraPrice) > 0) data["extraPrice"] = parseIntWithThrow(extraPrice)
+      if (promotion && parseIntWithThrow(promotion) > 0) data["promotion"] = parseIntWithThrow(promotion)
 
       await _addPrice(data)
       await updatePriceDataState()
@@ -165,7 +157,7 @@ const MyTable = () => {
       if (!id) throw new Error("Pas d'identifiant !")
       const price = prices?.find((p) => p.id === id)
       if (!price) throw new Error("Aucun tarif !")
-      await _removePrice(price)
+      await _removePrice(id)
       await updatePriceDataState()
       setModal({ text: "Tarif supprimé !", variant: "success" })
     } catch (error) {
@@ -179,11 +171,15 @@ const MyTable = () => {
     try {
       if (!id) throw new Error("Pas d'identifiant !")
       const { value, type, name } = e.target
+      const price = prices?.find((p) => p.id === id)
+      if (!price) throw new Error("Price data no exist !")
       let data: { [key: string]: any } = {}
       if (type === "number") data[name] = parseIntWithThrow(value)
       else data[name] = value
-      await updatePrice(data, id)
-      await updatePriceDataState()
+      if (data[name] !== (price as any)[name]) {
+        await updatePrice(data, id)
+        await updatePriceDataState()
+      }
     } catch (error) {
       logger("err", error)
       if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
@@ -210,7 +206,7 @@ const MyTable = () => {
   }
 
   return (
-    <Table bordered hover responsive="sm" className="mt-5 caption-top">
+    <Table responsive="sm" className="mt-5">
       <thead>
         <tr>
           <th className="text-nowrap">Action</th>

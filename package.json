@@ -10,7 +10,8 @@
     "webmanifest": "node site.webmanifest.js",
     "prebuild": "yarn webmanifest",
     "postbuild": "next-sitemap",
-    "all": "yarn build && yarn start"
+    "all": "yarn build && yarn start",
+    "debug": "node --inspect-brk ./node_modules/next/dist/bin/next"
   },
   "dependencies": {
     "bootstrap": "^5.2.0",

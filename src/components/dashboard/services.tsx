@@ -1,12 +1,12 @@
-import { Button, Card, Col, Row } from "react-bootstrap"
 import NextImage from "next/image"
+import { Button, Card, Col, Row } from "react-bootstrap"
 import { getServices, addService as _addService, updateServiceImage, updateService, removeService as _removeService } from "@libs/firebase"
 import { useSetRecoilState, useRecoilStateLoadable } from "recoil"
 import { modalState, servicesState } from "@libs/atoms"
 import { logger } from "@libs/helpers"
 
+import type { KeyboardEvent } from "react"
 import type { Image, ServiceData } from "@libs/firebase"
-import type { KeyboardEvent, MouseEvent } from "react"
 
 import styles from "@styles/Services.module.scss"
 
@@ -86,7 +86,7 @@ const Component = () => {
       if (!id) throw new Error("Pas d'identifiant !")
       const service = services?.find((s) => s.id === id)
       if (!service) throw new Error("Aucun service !")
-      await _removeService(service)
+      await _removeService(id)
       await updateServiceDataState()
       setModal({ text: "Service supprimé !", variant: "success" })
     } catch (error) {

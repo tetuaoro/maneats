@@ -1,7 +1,7 @@
 import type { NextOrObserver, User } from "firebase/auth"
 import { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-import { onSnapshot, Timestamp, query, orderBy, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, Timestamp, query, where, orderBy, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./helpers"
@@ -42,6 +42,7 @@ export interface Image {
 }
 export interface ServiceData {
   name: string
+  public?: boolean
   image: Image
   description: string
   createdAt?: Timestamp
@@ -63,6 +64,18 @@ export interface PriceData {
   price: number
   extraPrice?: number
   promotion?: number
+  public?: boolean
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
+}
+
+type PhoneType = string | number
+export interface BillData {
+  id?: string
+  counter: number
+  name: string
+  phone: PhoneType
+  email?: string
   createdAt?: Timestamp
   updatedAt?: Timestamp
 }
@@ -70,6 +83,7 @@ export interface PriceData {
 export const ACCOUNT_REF = "account"
 export const SERVICES_REF = "services"
 export const PRICES_REF = "prices"
+export const BILLS_REF = "bills"
 
 /* ACCOUNT */
 
@@ -131,7 +145,7 @@ export const getAccount = async () => {
 
 export const getServices = async () => {
   try {
-    const q = query(collection(db, SERVICES_REF))
+    const q = query(collection(db, SERVICES_REF), where("public", "==", true))
     const docsSnap = await _getDocs(q)
     if (docsSnap.empty) throw new Error("services empty !")
     const data: ServiceData[] = []
@@ -148,21 +162,18 @@ export const getServices = async () => {
 
 export const addService = async (data: ServiceData) => {
   try {
-    data = { ...data, createdAt: Timestamp.now() }
+    data = { ...data, public: true, createdAt: Timestamp.now() }
     await _addDoc(collection(db, SERVICES_REF), data)
   } catch (error) {
     throw error
   }
 }
 
-export const removeService = async (data: ServiceData) => {
+export const removeService = async (id: string) => {
   try {
-    const serviceDataDoc = doc(collection(db, SERVICES_REF), data.id)
-    await deleteDoc(serviceDataDoc)
-    if (data.image.src.match("https")) {
-      const fileRef = ref(storage, data.image.src)
-      await deleteObject(fileRef)
-    }
+    const serviceDoc = doc(collection(db, SERVICES_REF), id)
+    const docData = { public: false, updatedAt: Timestamp.now() }
+    await setDoc(serviceDoc, docData, { merge: true })
   } catch (error) {
     throw error
   }
@@ -170,12 +181,9 @@ export const removeService = async (data: ServiceData) => {
 
 export const updateService = async (data: Partial<ServiceData>, id: string) => {
   try {
-    const serviceDataDoc = doc(collection(db, SERVICES_REF), id)
-    const docData = {
-      ...data,
-      updatedAt: Timestamp.now(),
-    }
-    await setDoc(serviceDataDoc, docData, { merge: true })
+    const serviceDoc = doc(collection(db, SERVICES_REF), id)
+    const docData = { ...data, updatedAt: Timestamp.now() }
+    await setDoc(serviceDoc, docData, { merge: true })
   } catch (error) {
     throw error
   }
@@ -209,11 +217,12 @@ export const updateServiceImage = async (image: Image, file: Blob, data: Service
 
 export const getPrices = async () => {
   try {
-    const q = query(collection(db, PRICES_REF), orderBy("group"))
+    const q = query(collection(db, PRICES_REF), orderBy("group"), where("public", "==", true))
     const docsSnap = await _getDocs(q)
     if (docsSnap.empty) throw new Error("prices empty !")
     const data: PriceData[] = []
     docsSnap.forEach((doc) => {
+      logger("log", doc.ref, doc.ref.path)
       const docData = doc.data() as PriceData
       docData["id"] = doc.id
       data.push(docData)
@@ -226,17 +235,18 @@ export const getPrices = async () => {
 
 export const addPrice = async (data: PriceData) => {
   try {
-    data = { ...data, createdAt: Timestamp.now() }
+    data = { ...data, public: true, createdAt: Timestamp.now() }
     await _addDoc(collection(db, PRICES_REF), data)
   } catch (error) {
     throw error
   }
 }
 
-export const removePrice = async (data: PriceData) => {
+export const removePrice = async (id: string) => {
   try {
-    const serviceDataDoc = doc(collection(db, PRICES_REF), data.id)
-    await deleteDoc(serviceDataDoc)
+    const priceDoc = doc(collection(db, PRICES_REF), id)
+    const docData = { public: false, updatedAt: Timestamp.now() }
+    await setDoc(priceDoc, docData, { merge: true })
   } catch (error) {
     throw error
   }
@@ -245,11 +255,27 @@ export const removePrice = async (data: PriceData) => {
 export const updatePrice = async (data: Partial<PriceData>, id: string) => {
   try {
     const priceDoc = doc(collection(db, PRICES_REF), id)
-    const docData = {
-      ...data,
-      updatedAt: Timestamp.now(),
-    }
+    const docData = { ...data, updatedAt: Timestamp.now() }
     await setDoc(priceDoc, docData, { merge: true })
+  } catch (error) {
+    throw error
+  }
+}
+
+/* BILLS */
+
+export const getBills = async () => {
+  try {
+    const q = query(collection(db, BILLS_REF), orderBy("createdAt"))
+    const docsSnap = await _getDocs(q)
+    if (docsSnap.empty) throw new Error("bills empty !")
+    const data: BillData[] = []
+    docsSnap.forEach((doc) => {
+      const docData = doc.data() as BillData
+      docData["id"] = doc.id
+      data.push(docData)
+    })
+    return data
   } catch (error) {
     throw error
   }

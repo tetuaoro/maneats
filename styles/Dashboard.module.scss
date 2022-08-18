@@ -1,3 +1,5 @@
+$primary: #d4262f;
+
 .modalBackdrop {
   z-index: -1 !important;
 }
@@ -5,4 +7,19 @@
 .modal {
   width: 0 !important;
   height: 0 !important;
+}
+
+.badge::before {
+  content: attr(data-badge);
+  position: absolute;
+  top: 1ch;
+  right: 0;
+  color: white;
+  background-color: $primary;
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

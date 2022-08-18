@@ -1,14 +1,5 @@
-import { UserCredential } from "firebase/auth"
 import { useState, useEffect } from "react"
-
-export const isDeviceMobile = () => {
-  const [isMobile, setDevice] = useState(false)
-  useEffect(() => {
-    navigator.userAgent.match("Android|iPhone|iPad") && setDevice(true)
-  }, [])
-
-  return [isMobile]
-}
+import { fbId } from "@libs/app"
 
 export const useTransition = () => {
   const [nodeList, setNodeList] = useState<NodeListOf<Element> | undefined>()
@@ -31,4 +22,13 @@ export const useTransition = () => {
   }, [nodeList])
 
   return
+}
+
+export const useFacebookURL = () => {
+  const [fb_url, setFbURL] = useState(`https://facebook.com/pg/${fbId}`)
+  useEffect(() => {
+    if (navigator.userAgent.match("Android|iPhone|iPad")) setFbURL(`fb://profile/${fbId}`)
+  }, [])
+
+  return [fb_url]
 }
