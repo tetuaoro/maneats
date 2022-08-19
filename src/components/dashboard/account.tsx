@@ -3,6 +3,7 @@ import { Button, Card, Col, Form, Row, Placeholder } from "react-bootstrap"
 import { updateAuthenticationPassword } from "@libs/firebase"
 import { useSetRecoilState, useRecoilValueLoadable } from "recoil"
 import { accountState, modalState } from "@libs/atoms"
+import EmbedLayout from "@components/dashboard/layouts"
 
 import type { FormEvent } from "react"
 import type { AccountData } from "@libs/firebase"
@@ -76,7 +77,7 @@ const Component = () => {
   const { state, contents } = useRecoilValueLoadable(accountState)
   const account = contents as AccountData | null
   return (
-    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
+    <EmbedLayout>
       <h1>Compte</h1>
       <PasswordComponent account={account} />
       <Row xs={1} sm={2} md={3} className="g-4 pt-5">
@@ -122,7 +123,7 @@ const Component = () => {
           </>
         )}
       </Row>
-    </main>
+    </EmbedLayout>
   )
 }
 

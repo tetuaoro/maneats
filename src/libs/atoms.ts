@@ -1,11 +1,11 @@
-import { onAuthStateChanged, getAccount, getServices, getPrices } from "./firebase"
+import { onAuthStateChanged, getAccount, getServices, getPrices, getBills } from "./firebase"
 import { atom, selector } from "recoil"
 import { Login, Account, Services, Prices, Bills } from "@components/dashboard/layouts"
 import { logger } from "./helpers"
 
 import type { ComponentType } from "react"
 import type { User } from "firebase/auth"
-import type { AccountData, ServiceData, PriceData } from "./firebase"
+import type { AccountData, ServiceData, PriceData, BillData } from "./firebase"
 
 /* AUTHENTICATION WITH FIREBASE */
 
@@ -90,6 +90,31 @@ export const pricesState = selector<PriceData[] | null>({
   },
   set: ({ get, set }, newState) => {
     if (get(authState)) set(proxyPricesState, newState)
+  },
+})
+
+/* BILLS DATA WITH FIREBASE */
+
+const proxyBillsState = atom<BillData[] | null>({
+  key: "proxy-bills-atom-state",
+  default: null,
+})
+
+export const billsState = selector<BillData[] | null>({
+  key: "bills-selector-state",
+  get: async ({ get }) => {
+    try {
+      if (!get(authState)) return null
+      const bills = get(proxyBillsState)
+      if (bills) return bills
+      return await getBills()
+    } catch (error) {
+      logger("err", error)
+      return null
+    }
+  },
+  set: ({ get, set }, newState) => {
+    if (get(authState)) set(proxyBillsState, newState)
   },
 })
 

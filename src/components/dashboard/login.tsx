@@ -3,6 +3,7 @@ import { useRef, useState } from "react"
 import { useSetRecoilState } from "recoil"
 import { modalState } from "@libs/atoms"
 import { loginWithEmail } from "@libs/firebase"
+import EmbedLayout from "@components/dashboard/layouts"
 
 import type { FormEvent } from "react"
 
@@ -29,7 +30,7 @@ const Component = () => {
   }
 
   return (
-    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
+    <EmbedLayout>
       <h1>Se connecter</h1>
       <Row>
         <Col></Col>
@@ -53,7 +54,7 @@ const Component = () => {
         </Col>
         <Col></Col>
       </Row>
-    </main>
+    </EmbedLayout>
   )
 }
 

@@ -24,7 +24,6 @@ export const parseIntWithThrow = (value: string) => {
 export const getFacebookURLWithThrow = async (fb_url: string, else_url?: string) => {
   try {
     const res = await fetch(fb_url)
-    logger("log", res.status, res)
     if (res.status >= 400) throw new Error(`status ${res.status}`)
   } catch (error) {
     if (else_url && else_url.length > 0) {
@@ -32,3 +31,11 @@ export const getFacebookURLWithThrow = async (fb_url: string, else_url?: string)
     } else throw new Error("invalid fb_url: " + fb_url)
   }
 }
+
+export const shuffleString = (str: string) =>
+  str
+    .split("")
+    .sort(function () {
+      return 0.5 - Math.random()
+    })
+    .join("")

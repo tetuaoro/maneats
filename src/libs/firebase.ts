@@ -1,10 +1,11 @@
-import type { NextOrObserver, User } from "firebase/auth"
-import { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
-import { onSnapshot, Timestamp, query, where, orderBy, collection, deleteDoc, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, arrayUnion, Timestamp, query, where, orderBy, collection, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
-import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, setPersistence, updatePassword } from "firebase/auth"
+import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./helpers"
+
+import type { DocumentData, DocumentSnapshot } from "firebase/firestore"
+import type { NextOrObserver, User } from "firebase/auth"
 
 const firebaseConfigClientSide = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
@@ -69,13 +70,13 @@ export interface PriceData {
   updatedAt?: Timestamp
 }
 
-type PhoneType = string | number
 export interface BillData {
   id?: string
-  counter: number
-  name: string
-  phone: PhoneType
-  email?: string
+  fullname: string
+  phone: string
+  refs: string[]
+  total: number
+  comment?: string
   createdAt?: Timestamp
   updatedAt?: Timestamp
 }
@@ -222,7 +223,6 @@ export const getPrices = async () => {
     if (docsSnap.empty) throw new Error("prices empty !")
     const data: PriceData[] = []
     docsSnap.forEach((doc) => {
-      logger("log", doc.ref, doc.ref.path)
       const docData = doc.data() as PriceData
       docData["id"] = doc.id
       data.push(docData)
@@ -276,6 +276,22 @@ export const getBills = async () => {
       data.push(docData)
     })
     return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const addBill = async (data: BillData) => {
+  try {
+    data = { ...data, createdAt: Timestamp.now() }
+    await _addDoc(collection(db, BILLS_REF), data)
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateBill = async () => {
+  try {
   } catch (error) {
     throw error
   }

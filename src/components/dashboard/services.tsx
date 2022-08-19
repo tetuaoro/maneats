@@ -4,6 +4,7 @@ import { getServices, addService as _addService, updateServiceImage, updateServi
 import { useSetRecoilState, useRecoilStateLoadable } from "recoil"
 import { modalState, servicesState } from "@libs/atoms"
 import { logger } from "@libs/helpers"
+import EmbedLayout from "@components/dashboard/layouts"
 
 import type { KeyboardEvent } from "react"
 import type { Image, ServiceData } from "@libs/firebase"
@@ -120,7 +121,7 @@ const Component = () => {
   }
 
   return (
-    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
+    <EmbedLayout>
       <h1>Services</h1>
       <Button variant="dark" onClick={addService}>
         Ajouter un service
@@ -177,7 +178,7 @@ const Component = () => {
           </Card.Body>
         </Card>
       )}
-    </main>
+    </EmbedLayout>
   )
 }
 

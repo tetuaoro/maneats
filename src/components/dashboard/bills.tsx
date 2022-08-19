@@ -1,43 +1,355 @@
-import { Table } from "react-bootstrap"
+import { useState, useRef, useContext, createContext } from "react"
+import { Button, Form, Modal, Table, Row, Col, FloatingLabel, InputGroup } from "react-bootstrap"
+import { useRecoilStateLoadable, useRecoilValueLoadable, useSetRecoilState } from "recoil"
+import { addBill as _addBill, getBills, removePrice as _removePrice, updatePrice } from "@libs/firebase"
+import { logger, parseIntWithThrow, shuffleString } from "@libs/helpers"
+import { modalState, billsState, pricesState } from "@libs/atoms"
+import { telephone } from "@libs/app"
+import EmbedLayout from "@components/dashboard/layouts"
+
+import type { FormEvent, ChangeEvent, Dispatch, SetStateAction, KeyboardEvent, PropsWithChildren, MouseEvent, FocusEvent } from "react"
+import type { BillData, PriceData } from "@libs/firebase"
+
+import styles from "@styles/Bills.module.scss"
+
+type ModalContextType = {
+  show: boolean
+  setShow: Dispatch<SetStateAction<boolean>>
+}
+
+const defaultState = {
+  show: false,
+  setShow: () => {},
+}
+
+const ModalContext = createContext<ModalContextType>(defaultState)
+
+const FormModal = (props: PropsWithChildren) => {
+  const formRef = useRef<HTMLFormElement | null>(null)
+  const pricesRef = useRef<HTMLDivElement | null>(null)
+  const [show, setShow] = useState(false)
+  const [validated, setValidated] = useState(false)
+
+  const setBills = useSetRecoilState(billsState)
+  const setModal = useSetRecoilState(modalState)
+
+  const updateBillDataState = async () => {
+    try {
+      const data = await getBills()
+      setBills(data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const modalError = (error?: any) => {
+    logger("err", error)
+    if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
+    else setModal({ text: "Erreur lors de l'ajout !", variant: "danger" })
+  }
+
+  const addBill = async () => {
+    try {
+      if (!prices) throw new Error("no prices data !")
+      const { current } = pricesRef
+      if (!current) throw new Error("no form reference !")
+      const inputs = current.querySelectorAll("input")
+      if (!inputs) throw new Error("no inputs reference !")
+
+      let total = 0
+      const refs: string[] = []
+      const separator = "|"
+      inputs.forEach((input) => {
+        try {
+          if (input.type === "checkbox" && input.id.startsWith(checkboxId) && input.checked) {
+            const id = input.id.substring(checkboxId.length)
+            const priceData = prices.find((p) => p.id === id)
+            if (!priceData) return
+            total += priceData.price
+            const inputExtraPrice = current.querySelector(`#${extrapriceId}${id}`) as HTMLInputElement | null
+            if (inputExtraPrice && parseIntWithThrow(inputExtraPrice.value) > 1 && priceData.extraPrice && priceData.extraPrice > 1)
+              total += priceData.extraPrice * parseIntWithThrow(inputExtraPrice.value) - (priceData.price > 0 ? 1 : 0)
+            let ref = priceData.group.replace(/^\d+(\W|)/, "") + separator + priceData.description + separator + (inputExtraPrice?.value || 1)
+            refs.push(ref)
+          }
+        } catch (error) {
+          refs.splice(0, refs.length)
+          modalError(error)
+        }
+      })
+
+      if (refs.length === 0) throw new Error("no entry !")
+
+      const fullname = (document.querySelector("[name='fullname']") as HTMLInputElement | null)?.value
+      const phone = (document.querySelector("[name='phone']") as HTMLInputElement | null)?.value
+      const comment = (document.querySelector("[name='comment']") as HTMLInputElement | null)?.value
+
+      if (!fullname || !phone) throw new Error("fullname & phone required !")
+
+      let data: BillData = {
+        fullname,
+        phone,
+        refs,
+        comment,
+        total,
+      }
+
+      logger("log", data)
+
+      // await _addBill(data)
+      // await updateBillDataState()
+    } catch (error) {
+      modalError(error)
+    }
+  }
+
+  const handleClose = () => {
+    setShow(false)
+    setValidated(false)
+  }
+
+  const handleForm = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    // const kod = "13kod".replace(/^\d+(\W|)/, "")
+
+    if (!e.currentTarget.checkValidity()) {
+      setValidated(true)
+      return
+    }
+    await addBill()
+    setShow(false)
+    setValidated(false)
+  }
+
+  const { state, contents } = useRecoilValueLoadable(pricesState)
+  const prices = contents as PriceData[] | null
+
+  return (
+    <ModalContext.Provider value={{ show, setShow }}>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ajouter un nouveau devis</Modal.Title>
+        </Modal.Header>
+        {state === "hasValue" && prices && (
+          <>
+            <Modal.Body>
+              <Form id="my-modal-form-bill" noValidate validated={validated} onSubmit={handleForm}>
+                <div className={`d-flex align-items-center ${styles.gap}`}>
+                  <span>Coordonnées</span> <hr className="w-100" />
+                </div>
+                <Form.Group className="mb-3" controlId="fullname">
+                  <Form.Label className={`d-flex align-items-center ${styles.gap}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill" viewBox="0 0 16 16">
+                      <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                    </svg>
+                    <span>Nom complet</span>
+                  </Form.Label>
+                  <Form.Control name="fullname" placeholder="ex : Teva Manea" autoFocus required />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="phone">
+                  <Form.Label className={`d-flex align-items-center ${styles.gap}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-telephone-fill" viewBox="0 0 16 16">
+                      <path
+                        fillRule="evenodd"
+                        d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"
+                      />
+                    </svg>
+                    <span>Téléphone</span>
+                  </Form.Label>
+                  <InputGroup>
+                    <InputGroup.Text id="basic-addon1">+689</InputGroup.Text>
+                    <Form.Control
+                      aria-label={"ex : " + telephone.replace("+689", "")}
+                      aria-describedby="basic-addon1"
+                      name="phone"
+                      type="tel"
+                      pattern="^(40|87|89)([0-9]{6})$"
+                      placeholder={"ex : " + telephone.replace("+689", "")}
+                      required
+                    />
+                  </InputGroup>
+                </Form.Group>
+                <div className={`d-flex align-items-center ${styles.gap}`}>
+                  <span>Services</span> <hr className="w-100" />
+                </div>
+                <div ref={pricesRef}>
+                  <FormPrices prices={prices} />
+                </div>
+
+                <div className={`d-flex align-items-center ${styles.gap}`}>
+                  <span>Commentaire</span> <hr className="w-100" />
+                </div>
+                <Form.Control as="textarea" name="comment" />
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="dark" type="submit" form="my-modal-form-bill">
+                Ajouter
+              </Button>
+            </Modal.Footer>
+          </>
+        )}
+      </Modal>
+      {props.children}
+    </ModalContext.Provider>
+  )
+}
+
+type PropsFormPrice = {
+  data: PriceData
+}
+
+const checkboxId = "checkbox-"
+const extrapriceId = "extraprice-"
+
+const FormPrice = ({ data }: PropsFormPrice) => {
+  const [checked, setChecked] = useState(false)
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked)
+
+  return (
+    <>
+      <Form.Check label={data.description} id={`${checkboxId}${data.id}`} onChange={onChange} className="mb-3" type="checkbox" />
+      {checked && data.extraPrice && data.extraPrice > 0 ? (
+        <FloatingLabel label="Quantité">
+          <Form.Control placeholder="90" id={`${extrapriceId}${data.id}`} type="number" min={1} defaultValue={1} required />
+        </FloatingLabel>
+      ) : (
+        ""
+      )}
+    </>
+  )
+}
+
+type PropsFormPrices = {
+  prices: PriceData[]
+}
+
+const FormPrices = ({ prices }: PropsFormPrices) => {
+  const groups: PriceData[][] = Object.values(
+    (prices as any[]).reduce((acc, x) => {
+      acc[x.group] = [...(acc[x.group] || []), x]
+      return acc
+    }, {})
+  )
+
+  return (
+    <>
+      {groups.map((group, k1) => (
+        <div key={k1}>
+          <div className="text-decoration-underline">{group[0].group}</div>
+          {group.map((price, k2) => (
+            <FormPrice key={k2} data={price} />
+          ))}
+        </div>
+      ))}
+    </>
+  )
+}
 
 const MyTable = () => {
+  const [{ state, contents }, setBills] = useRecoilStateLoadable(billsState)
+  const bills = contents as BillData[] | null
+  const setModal = useSetRecoilState(modalState)
+
+  const updateBillDataState = async () => {
+    try {
+      const data = await getBills()
+      setBills(data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const removePrice = async (id?: string) => {
+    try {
+      if (!id) throw new Error("Pas d'identifiant !")
+      const price = bills?.find((p) => p.id === id)
+      if (!price) throw new Error("Aucun tarif !")
+      await _removePrice(id)
+      await updateBillDataState()
+      setModal({ text: "Tarif supprimé !", variant: "success" })
+    } catch (error) {
+      logger("err", error)
+      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
+      else setModal({ text: "Erreur lors de la suppression !", variant: "danger" })
+    }
+  }
+
+  const onBlur = async (e: FocusEvent<HTMLInputElement>, id?: string) => {
+    try {
+      if (!id) throw new Error("Pas d'identifiant !")
+      const { value, type, name } = e.target
+      const price = bills?.find((p) => p.id === id)
+      if (!price) throw new Error("Price data no exist !")
+      let data: { [key: string]: any } = {}
+      if (type === "number") data[name] = parseIntWithThrow(value)
+      else data[name] = value
+      if (data[name] !== (price as any)[name]) {
+        await updatePrice(data, id)
+        await updateBillDataState()
+      }
+    } catch (error) {
+      logger("err", error)
+      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
+      else setModal({ text: "Une erreur est survenue !", variant: "danger" })
+    }
+  }
+
+  const onClick = (e: MouseEvent<HTMLTableCellElement>) => {
+    const target = e.target as Element
+    target.querySelector("input")?.focus()
+  }
+
+  const onInput = (e: FormEvent<HTMLTextAreaElement>) => {
+    const target = e.target as HTMLElement
+    target.style.height = "auto"
+    target.style.height = target.scrollHeight + "px"
+  }
+
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
   return (
     <Table responsive="sm" className="mt-5">
       <thead>
         <tr>
-          <th>
-            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-telephone-fill" viewBox="0 0 16 16">
-              <path
-                fillRule="evenodd"
-                d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"
-              />
-            </svg>
-          </th>
-          <th>
-            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-person-fill" viewBox="0 0 16 16">
-              <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-            </svg>
-          </th>
+          <th className="text-nowrap">Nom</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>
-            <a href="tel:+689323795" className="link-info">{"+68987323795".replace("+689", "")}</a>
-          </td>
-          <td>{"Tetuaoro"}</td>
+          <td>Tetuaoro</td>
         </tr>
       </tbody>
     </Table>
   )
 }
 
+const Layout = () => {
+  const { setShow } = useContext(ModalContext)
+  const handleShow = () => setShow(true)
+
+  return (
+    <EmbedLayout>
+      <h1>Devis/Factures</h1>
+      <Button variant="dark" onClick={handleShow}>
+        Faire un devis
+      </Button>
+      <MyTable />
+    </EmbedLayout>
+  )
+}
+
 const Component = () => {
   return (
-    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
-      <h1>Facture/Devis</h1>
-      <MyTable />
-    </main>
+    <FormModal>
+      <Layout />
+    </FormModal>
   )
 }
 

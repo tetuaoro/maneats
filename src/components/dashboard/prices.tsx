@@ -4,6 +4,7 @@ import { useRecoilStateLoadable, useSetRecoilState } from "recoil"
 import { addPrice as _addPrice, getPrices, removePrice as _removePrice, updatePrice } from "@libs/firebase"
 import { logger, parseIntWithThrow } from "@libs/helpers"
 import { modalState, pricesState } from "@libs/atoms"
+import EmbedLayout from "@components/dashboard/layouts"
 
 import type { FormEvent, Dispatch, SetStateAction, KeyboardEvent, PropsWithChildren, MouseEvent, FocusEvent } from "react"
 import type { PriceData } from "@libs/firebase"
@@ -278,13 +279,13 @@ const Layout = () => {
   const handleShow = () => setShow(true)
 
   return (
-    <main className="w-100 min-vh-100 p-3 p-sm-4 bg-gray-300">
+    <EmbedLayout>
       <h1>Tarifs</h1>
       <Button variant="dark" onClick={handleShow}>
         Ajouter un tarif
       </Button>
       <MyTable />
-    </main>
+    </EmbedLayout>
   )
 }
 
