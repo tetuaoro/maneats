@@ -1,14 +1,14 @@
 import { useState, useRef, useContext, createContext } from "react"
-import { Button, Form, Modal, Table, Row, Col, FloatingLabel, InputGroup } from "react-bootstrap"
-import { useRecoilStateLoadable, useRecoilValueLoadable, useSetRecoilState } from "recoil"
-import { addBill as _addBill, getBills, removePrice as _removePrice, updatePrice } from "@libs/firebase"
-import { logger, parseIntWithThrow, shuffleString } from "@libs/helpers"
+import { Button, Form, Modal, Table, FloatingLabel, InputGroup, Placeholder } from "react-bootstrap"
+import { useRecoilValueLoadable, useSetRecoilState } from "recoil"
+import { addBill as _addBill, getBills } from "@libs/firebase"
+import { logger, parseIntWithThrow } from "@libs/helpers"
 import { modalState, billsState, pricesState } from "@libs/atoms"
 import { telephone } from "@libs/app"
 import EmbedLayout from "@components/dashboard/layouts"
 
-import type { FormEvent, ChangeEvent, Dispatch, SetStateAction, KeyboardEvent, PropsWithChildren, MouseEvent, FocusEvent } from "react"
-import type { BillData, PriceData } from "@libs/firebase"
+import type { FormEvent, ChangeEvent, Dispatch, SetStateAction, PropsWithChildren } from "react"
+import type { BillData, PriceData, BillDataRefType } from "@libs/firebase"
 
 import styles from "@styles/Bills.module.scss"
 
@@ -25,7 +25,6 @@ const defaultState = {
 const ModalContext = createContext<ModalContextType>(defaultState)
 
 const FormModal = (props: PropsWithChildren) => {
-  const formRef = useRef<HTMLFormElement | null>(null)
   const pricesRef = useRef<HTMLDivElement | null>(null)
   const [show, setShow] = useState(false)
   const [validated, setValidated] = useState(false)
@@ -57,8 +56,7 @@ const FormModal = (props: PropsWithChildren) => {
       if (!inputs) throw new Error("no inputs reference !")
 
       let total = 0
-      const refs: string[] = []
-      const separator = "|"
+      const refs: BillDataRefType[] = []
       inputs.forEach((input) => {
         try {
           if (input.type === "checkbox" && input.id.startsWith(checkboxId) && input.checked) {
@@ -68,9 +66,13 @@ const FormModal = (props: PropsWithChildren) => {
             total += priceData.price
             const inputExtraPrice = current.querySelector(`#${extrapriceId}${id}`) as HTMLInputElement | null
             if (inputExtraPrice && parseIntWithThrow(inputExtraPrice.value) > 1 && priceData.extraPrice && priceData.extraPrice > 1)
-              total += priceData.extraPrice * parseIntWithThrow(inputExtraPrice.value) - (priceData.price > 0 ? 1 : 0)
-            let ref = priceData.group.replace(/^\d+(\W|)/, "") + separator + priceData.description + separator + (inputExtraPrice?.value || 1)
-            refs.push(ref)
+              total += priceData.extraPrice * (parseIntWithThrow(inputExtraPrice.value) - (priceData.price > 0 ? 1 : 0))
+            refs.push({
+              group: priceData.group.replace(/^\d+(\W|)/, ""),
+              description: priceData.description,
+              extraPrice: priceData.extraPrice || 0,
+              size: inputExtraPrice ? inputExtraPrice.value : "1",
+            })
           }
         } catch (error) {
           refs.splice(0, refs.length)
@@ -78,7 +80,7 @@ const FormModal = (props: PropsWithChildren) => {
         }
       })
 
-      if (refs.length === 0) throw new Error("no entry !")
+      if (refs.length === 0) throw new Error("no refs entry !")
 
       const fullname = (document.querySelector("[name='fullname']") as HTMLInputElement | null)?.value
       const phone = (document.querySelector("[name='phone']") as HTMLInputElement | null)?.value
@@ -90,14 +92,12 @@ const FormModal = (props: PropsWithChildren) => {
         fullname,
         phone,
         refs,
-        comment,
+        comment: comment || "",
         total,
       }
 
-      logger("log", data)
-
-      // await _addBill(data)
-      // await updateBillDataState()
+      await _addBill(data)
+      await updateBillDataState()
     } catch (error) {
       modalError(error)
     }
@@ -110,9 +110,6 @@ const FormModal = (props: PropsWithChildren) => {
 
   const handleForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    // const kod = "13kod".replace(/^\d+(\W|)/, "")
-
     if (!e.currentTarget.checkValidity()) {
       setValidated(true)
       return
@@ -248,83 +245,53 @@ const FormPrices = ({ prices }: PropsFormPrices) => {
 }
 
 const MyTable = () => {
-  const [{ state, contents }, setBills] = useRecoilStateLoadable(billsState)
+  const { state, contents } = useRecoilValueLoadable(billsState)
   const bills = contents as BillData[] | null
-  const setModal = useSetRecoilState(modalState)
-
-  const updateBillDataState = async () => {
-    try {
-      const data = await getBills()
-      setBills(data)
-    } catch (error) {
-      throw error
-    }
-  }
-
-  const removePrice = async (id?: string) => {
-    try {
-      if (!id) throw new Error("Pas d'identifiant !")
-      const price = bills?.find((p) => p.id === id)
-      if (!price) throw new Error("Aucun tarif !")
-      await _removePrice(id)
-      await updateBillDataState()
-      setModal({ text: "Tarif supprimé !", variant: "success" })
-    } catch (error) {
-      logger("err", error)
-      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
-      else setModal({ text: "Erreur lors de la suppression !", variant: "danger" })
-    }
-  }
-
-  const onBlur = async (e: FocusEvent<HTMLInputElement>, id?: string) => {
-    try {
-      if (!id) throw new Error("Pas d'identifiant !")
-      const { value, type, name } = e.target
-      const price = bills?.find((p) => p.id === id)
-      if (!price) throw new Error("Price data no exist !")
-      let data: { [key: string]: any } = {}
-      if (type === "number") data[name] = parseIntWithThrow(value)
-      else data[name] = value
-      if (data[name] !== (price as any)[name]) {
-        await updatePrice(data, id)
-        await updateBillDataState()
-      }
-    } catch (error) {
-      logger("err", error)
-      if (error instanceof Error) setModal({ text: error.message, variant: "danger" })
-      else setModal({ text: "Une erreur est survenue !", variant: "danger" })
-    }
-  }
-
-  const onClick = (e: MouseEvent<HTMLTableCellElement>) => {
-    const target = e.target as Element
-    target.querySelector("input")?.focus()
-  }
-
-  const onInput = (e: FormEvent<HTMLTextAreaElement>) => {
-    const target = e.target as HTMLElement
-    target.style.height = "auto"
-    target.style.height = target.scrollHeight + "px"
-  }
-
-  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }
 
   return (
     <Table responsive="sm" className="mt-5">
       <thead>
-        <tr>
-          <th className="text-nowrap">Nom</th>
+        <tr className="border-bottom border-dark">
+          <th className="text-nowrap">Nom complet</th>
+          <th className="text-nowrap">Téléphone</th>
+          <th className="text-nowrap">Prix Total</th>
+          <th className="text-nowrap">Désignation / description / nombre</th>
+          <th className="text-nowrap">Commentaire</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Tetuaoro</td>
-        </tr>
+        {state !== "hasValue" && (
+          <tr>
+            <Placeholder as="td" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+            <Placeholder as="td" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+            <Placeholder as="td" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+          </tr>
+        )}
+        {state === "hasValue" &&
+          bills &&
+          bills.map((bill, k) => (
+            <tr key={k} className="border-bottom border-dark">
+              <td>{bill.fullname}</td>
+              <td>
+                <a className="link-success" href={`tel:+689${bill.phone}`}>
+                  {bill.phone}
+                </a>
+              </td>
+              <td>{bill.total}</td>
+              <td>
+                {bill.refs.map((ref, k2) => (
+                  <div key={k2} className="text-nowrap">{`${ref.group} / ${ref.description} / ${ref.size}`}</div>
+                ))}
+              </td>
+              <td>{bill.comment}</td>
+            </tr>
+          ))}
       </tbody>
     </Table>
   )

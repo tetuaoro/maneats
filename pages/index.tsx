@@ -5,9 +5,9 @@ import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
-import EstimateLayout from "@components/home/estimates"
-import { getServices } from "@libs/firebase"
-import { exploitableServicesData, logger } from "@libs/helpers"
+import PriceLayout from "@components/home/prices"
+import { getPrices, getServices } from "@libs/firebase"
+import { exploitableServicesData, exploitablePricesData, logger } from "@libs/helpers"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -49,7 +49,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
         if ("serviceWorker" in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations()
           for (const registration of registrations) {
-            logger("log", "unregister sw", await registration.unregister())
+            logger( "unregister sw", await registration.unregister())
           }
         }
       }
@@ -90,18 +90,18 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       </Head>
       <MainLayout />
       <ServiceLayout services={props.services} />
-      <EstimateLayout />
+      <PriceLayout prices={props.prices} />
     </main>
   )
 }
 
 export const getStaticProps = async () => {
   try {
-    const data = exploitableServicesData(await getServices())
-    return { props: { services: data }, revalidate: 60 }
+    const [services, prices] = await Promise.all([getServices(), getPrices()])
+    return { props: { services: exploitableServicesData(services), prices: exploitablePricesData(prices) }, revalidate: 60 }
   } catch (error) {
     logger("err", error)
-    return { props: { services: null }, revalidate: 60 }
+    return { props: { services: null, prices: null }, revalidate: 60 }
   }
 }
 

@@ -70,13 +70,19 @@ export interface PriceData {
   updatedAt?: Timestamp
 }
 
+export type BillDataRefType = {
+  group: string
+  description: string
+  extraPrice: number
+  size: string
+}
 export interface BillData {
   id?: string
   fullname: string
   phone: string
-  refs: string[]
+  refs: BillDataRefType[]
   total: number
-  comment?: string
+  comment: string
   createdAt?: Timestamp
   updatedAt?: Timestamp
 }
@@ -285,13 +291,6 @@ export const addBill = async (data: BillData) => {
   try {
     data = { ...data, createdAt: Timestamp.now() }
     await _addDoc(collection(db, BILLS_REF), data)
-  } catch (error) {
-    throw error
-  }
-}
-
-export const updateBill = async () => {
-  try {
   } catch (error) {
     throw error
   }
