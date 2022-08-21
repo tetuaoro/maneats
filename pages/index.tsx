@@ -5,7 +5,7 @@ import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
-import PriceLayout from "@components/home/prices"
+import PriceLayout from "@components/home/bills"
 import { getPrices, getServices } from "@libs/firebase"
 import { exploitableServicesData, exploitablePricesData, logger } from "@libs/helpers"
 

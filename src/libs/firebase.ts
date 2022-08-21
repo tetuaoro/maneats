@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { onSnapshot, arrayUnion, Timestamp, query, where, orderBy, collection, getFirestore, doc, getDoc as _getDoc, setDoc, getDocs as _getDocs, addDoc as _addDoc } from "firebase/firestore"
+import { onSnapshot, getDocs, increment, updateDoc, Timestamp, query, where, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./helpers"
@@ -79,18 +79,23 @@ export type BillDataRefType = {
 export interface BillData {
   id?: string
   fullname: string
+  public?: boolean
   phone: string
   refs: BillDataRefType[]
   total: number
   comment: string
   createdAt?: Timestamp
-  updatedAt?: Timestamp
+}
+
+export interface BillCounter {
+  counter: number
 }
 
 export const ACCOUNT_REF = "account"
 export const SERVICES_REF = "services"
 export const PRICES_REF = "prices"
 export const BILLS_REF = "bills"
+export const COUNTER_REF = "counter"
 
 /* ACCOUNT */
 
@@ -140,7 +145,7 @@ export const getAccount = async () => {
   try {
     const docId = "54ckQ6JK8nQkyNea1r3J"
     const docRef = doc(collection(db, ACCOUNT_REF), docId)
-    const docSnap = await _getDoc(docRef)
+    const docSnap = await getDoc(docRef)
     if (!docSnap.exists()) throw new Error("account empty !")
     return docSnap.data() as AccountData
   } catch (error) {
@@ -153,7 +158,7 @@ export const getAccount = async () => {
 export const getServices = async () => {
   try {
     const q = query(collection(db, SERVICES_REF), where("public", "==", true))
-    const docsSnap = await _getDocs(q)
+    const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("services empty !")
     const data: ServiceData[] = []
     docsSnap.forEach((doc) => {
@@ -170,7 +175,7 @@ export const getServices = async () => {
 export const addService = async (data: ServiceData) => {
   try {
     data = { ...data, public: true, createdAt: Timestamp.now() }
-    await _addDoc(collection(db, SERVICES_REF), data)
+    await addDoc(collection(db, SERVICES_REF), data)
   } catch (error) {
     throw error
   }
@@ -225,7 +230,7 @@ export const updateServiceImage = async (image: Image, file: Blob, data: Service
 export const getPrices = async () => {
   try {
     const q = query(collection(db, PRICES_REF), orderBy("group"), where("public", "==", true))
-    const docsSnap = await _getDocs(q)
+    const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("prices empty !")
     const data: PriceData[] = []
     docsSnap.forEach((doc) => {
@@ -242,7 +247,7 @@ export const getPrices = async () => {
 export const addPrice = async (data: PriceData) => {
   try {
     data = { ...data, public: true, createdAt: Timestamp.now() }
-    await _addDoc(collection(db, PRICES_REF), data)
+    await addDoc(collection(db, PRICES_REF), data)
   } catch (error) {
     throw error
   }
@@ -272,8 +277,8 @@ export const updatePrice = async (data: Partial<PriceData>, id: string) => {
 
 export const getBills = async () => {
   try {
-    const q = query(collection(db, BILLS_REF), orderBy("createdAt"))
-    const docsSnap = await _getDocs(q)
+    const q = query(collection(db, BILLS_REF), orderBy("createdAt", "desc"), where("public", "==", true))
+    const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("bills empty !")
     const data: BillData[] = []
     docsSnap.forEach((doc) => {
@@ -287,10 +292,37 @@ export const getBills = async () => {
   }
 }
 
-export const addBill = async (data: BillData) => {
+export const getBill = async (id: string) => {
   try {
-    data = { ...data, createdAt: Timestamp.now() }
-    await _addDoc(collection(db, BILLS_REF), data)
+    const _doc = await getDoc(doc(db, BILLS_REF, id))
+    if (!_doc.exists()) throw new Error("bill no exist !")
+    return _doc.data() as BillData
+  } catch (error) {
+    throw error
+  }
+}
+
+const counterID = "JDdeJ7O90Joj"
+export const addBill = async (data: BillData, incBill: boolean) => {
+  try {
+    data = { ...data, public: incBill, createdAt: Timestamp.now() }
+    const _doc = await addDoc(collection(db, BILLS_REF), data)
+    try {
+      if (incBill) await updateDoc(doc(db, COUNTER_REF, counterID), { counter: increment(1) })
+    } catch (error) {
+      if (incBill) await setDoc(doc(db, COUNTER_REF, counterID), { counter: 1 })
+    }
+    return _doc
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getBillCounter = async () => {
+  try {
+    const _doc = await getDoc(doc(db, COUNTER_REF, counterID))
+    if (_doc.exists()) return (_doc.data() as BillCounter).counter
+    return 0
   } catch (error) {
     throw error
   }

@@ -168,7 +168,7 @@ const FormModal = (props: PropsWithChildren) => {
                   </InputGroup>
                 </Form.Group>
                 <div className={`d-flex align-items-center ${styles.gap}`}>
-                  <span>Services</span> <hr className="w-100" />
+                  <span>Détails</span> <hr className="w-100" />
                 </div>
                 <div ref={pricesRef}>
                   <FormPrices prices={prices} />
@@ -255,13 +255,19 @@ const MyTable = () => {
           <th className="text-nowrap">Nom complet</th>
           <th className="text-nowrap">Téléphone</th>
           <th className="text-nowrap">Prix Total</th>
-          <th className="text-nowrap">Désignation / description / nombre</th>
+          <th className="text-nowrap" title="Désignation / description / nombre">Détails</th>
           <th className="text-nowrap">Commentaire</th>
         </tr>
       </thead>
       <tbody>
         {state !== "hasValue" && (
           <tr>
+            <Placeholder as="td" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+            <Placeholder as="td" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
             <Placeholder as="td" animation="glow">
               <Placeholder xs={12} />
             </Placeholder>
@@ -286,7 +292,7 @@ const MyTable = () => {
               <td>{bill.total}</td>
               <td>
                 {bill.refs.map((ref, k2) => (
-                  <div key={k2} className="text-nowrap">{`${ref.group} / ${ref.description} / ${ref.size}`}</div>
+                  <div key={k2} className="text-nowrap">{`[${ref.group}] [${ref.description}] [${ref.size}]`}</div>
                 ))}
               </td>
               <td>{bill.comment}</td>

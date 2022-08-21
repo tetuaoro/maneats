@@ -1,9 +1,9 @@
 import Image from "next/image"
 import { Col, Row } from "react-bootstrap"
-
-import styles from "@styles/Home.module.css"
 import { exploitableServicesData } from "@libs/helpers"
 import { useTransition } from "@libs/hooks"
+
+import styles from "@styles/Home.module.css"
 
 type Props = {
   services: ReturnType<typeof exploitableServicesData> | null

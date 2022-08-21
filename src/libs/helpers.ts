@@ -3,6 +3,12 @@ import type { ServiceData, PriceData } from "./firebase"
 export const exploitableServicesData = (data: ServiceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis(), updatedAt: d.updatedAt?.toMillis() }))
 export const exploitablePricesData = (data: PriceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis(), updatedAt: d.updatedAt?.toMillis() }))
 
+export const getFormatedFilenameDate = () => {
+  const date = new Date()
+  const concat = date.toDateString() + " " + date.getHours() + " " + date.getMinutes()
+  return concat.replaceAll(" ", "_")
+}
+
 export const logger = (...params: any[]) => {
   const call = params[0]
   const date = new Date().toLocaleString()
