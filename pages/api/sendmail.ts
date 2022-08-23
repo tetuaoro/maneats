@@ -1,9 +1,10 @@
 import { renderToStream } from "@react-pdf/renderer"
 import { createTransport } from "nodemailer"
 import { email } from "@libs/app"
-import { getBill, getBillCounter } from "@libs/firebase"
+import { getBillCounter } from "@libs/firebase"
 import Bill from "@components/server/bill"
 
+import { BillData } from "@libs/firebase"
 import type { NextApiRequest, NextApiResponse } from "next"
 import type { Options, SentMessageInfo } from "nodemailer/lib/smtp-transport"
 import { logger, getFormatedFilenameDate } from "@libs/helpers"
@@ -19,19 +20,21 @@ const mailConfig: Options = {
   },
 }
 const transporter = createTransport(mailConfig)
-const message = "Ci-joint le devis estimé ! Si vous avez soumis une demande de service, Manea tahiti services doit encore confirmer le devis."
+const message = "Ci-joint le devis estimé ! Si vous avez soumis une demande de service, Manea tahiti services doit encore confirmer le devis et vous contactera dans les plus bref délais."
 
 type BodyResponseType = {
   email: string
-  id: string
-  all: boolean
+  bill: BillData
+  sendbill: boolean
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     res.setHeader("Content-Type", "text/plain")
 
-    const { email: emailClient, id, all } = req.body as BodyResponseType
+    const { email: emailClient, bill, sendbill } = req.body as BodyResponseType
+
+    logger(req.body)
 
     const callBackTransporter = (error: Error | null, info: SentMessageInfo) => {
       if (error) {
@@ -44,30 +47,35 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      const [bill, counter] = await Promise.all([getBill(id), getBillCounter()])
+      const counter = await getBillCounter()
       const content = (await renderToStream(Bill({ bill, counter }))) as any
-      transporter.sendMail(
-        {
-          from: `Do not Reply <${from}>`,
-          to: all ? [emailClient, "tetuaoropro@gmail.com"] : emailClient,
-          subject: "Devis estimé de Manea tahiti services",
-          text: message,
-          html: `<p>${message}</p>`,
-          attachments: [
-            {
-              filename: `devis_maneats_${getFormatedFilenameDate()}`,
-              content,
-              contentType: "application/pdf",
-            },
-          ],
-        },
-        callBackTransporter
-      )
+
+      let mailOptions: any = {
+        from: `Do not Reply <${from}>`,
+        to: `"${bill.fullname}" <${emailClient}>`,
+        subject: "Devis estimé de Manea tahiti services",
+        text: message,
+        html: `<p>${message}</p>`,
+        attachments: [
+          {
+            filename: `devis_maneats_${getFormatedFilenameDate()}`,
+            content,
+            contentType: "application/pdf",
+          },
+        ],
+      }
+
+      if (sendbill) mailOptions["bcc"] = '"Pro ça" <tetuaoropro@gmail.com>'
+
+      transporter.sendMail(mailOptions, callBackTransporter)
     } catch (error) {
       logger("err", error)
-      res.status(500).send("Something broken !\r\n")
+      res.status(500).send("Something broken [003] !\r\n")
     }
-  } catch (error) {}
+  } catch (error) {
+    logger("err", error)
+    res.status(500).send("Something broken [004] !\r\n")
+  }
 }
 
 export const config = {

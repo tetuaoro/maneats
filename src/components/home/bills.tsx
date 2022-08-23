@@ -33,12 +33,16 @@ const FormLayout = ({ prices }: Props) => {
             if (!priceData) return
             total += priceData.price
             const inputExtraPrice = current.querySelector(`#${extrapriceId}${id}`) as HTMLInputElement | null
-            if (inputExtraPrice && parseIntWithThrow(inputExtraPrice.value) > 1 && priceData.extraPrice && priceData.extraPrice > 1)
-              total += priceData.extraPrice * (parseIntWithThrow(inputExtraPrice.value) - (priceData.price > 0 ? 1 : 0))
+            if (inputExtraPrice) {
+              const priceThrow = parseIntWithThrow(inputExtraPrice.value)
+              if (priceThrow > 1 && priceData.extraPrice > 1) total += priceData.extraPrice * (priceThrow - (priceData.price > 0 ? 1 : 0))
+            }
+            if (priceData.promotion > 0) total -= priceData.promotion
             refs.push({
               group: priceData.group.replace(/^\d+(\W|)/, ""),
               description: priceData.description,
-              extraPrice: priceData.extraPrice || 0,
+              extraPrice: priceData.extraPrice,
+              promotion: priceData.promotion,
               size: inputExtraPrice ? inputExtraPrice.value : "1",
             })
           }
@@ -81,26 +85,25 @@ const FormLayout = ({ prices }: Props) => {
       const email = (document.querySelector("[name='email']") as HTMLInputElement)?.value
       if (!email) throw new Error("L'email est requis !")
       const { submitter } = e.nativeEvent as any
-      const all = submitter.id === "send-bills"
-      const doc = await addBill(all)
-      if (doc && doc.id) {
-        const { status, text } = await fetch("/api/sendmail", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, id: doc.id, all }),
-        })
+      const sendbill = submitter.id === "send-bill"
+      const bill = await addBill(sendbill)
+      const { status, text } = await fetch("/api/sendmail", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, bill, sendbill }),
+      })
 
-        if (status >= 400) throw new Error(await text())
-      }
+      if (status >= 400) throw new Error(await text())
 
       setValidated(false)
       setError("")
+      setMessage(`Votre devis a bien été envoyé à ${email}${sendbill ? " et a été soumis à nos services." : "."}`)
     } catch (error) {
       logger("err", error)
-      setMessage(error instanceof Error ? error.message : "Une erreur est survenue ! [8907]")
+      setError(error instanceof Error ? error.message : "Une erreur est survenue ! [8907]")
     }
   }
 
@@ -154,7 +157,7 @@ const FormLayout = ({ prices }: Props) => {
       <div className={`d-flex align-items-center ${styles.gap}`}>
         <span>Commentaire</span> <hr className="w-100" />
       </div>
-      <Form.Control as="textarea" name="comment" className="mb-3" rows={6} />
+      <Form.Control as="textarea" name="comment" className="mb-3" rows={3} />
       <Form.Group className="mb-3" controlId="email">
         <Form.Label className={`d-flex align-items-center ${styles.gap}`}>
           <span>Email</span>
@@ -171,24 +174,28 @@ const FormLayout = ({ prices }: Props) => {
       <Button className="me-3 mb-2" variant="dark" type="submit">
         Recevoir uniquement le devis estimé
       </Button>
-      <Button className="me-3 mb-2" id="send-bills" type="submit">
+      <Button className="me-3 mb-2" id="send-bill" type="submit">
         Soumettre le devis
       </Button>
 
       {error.length > 0 && (
-        <Form.Control.Feedback type="invalid" className="d-block mb-2">
+        <Alert className="d-block mb-2" variant="danger">
           {error}
-        </Form.Control.Feedback>
+        </Alert>
       )}
 
-      {message.length > 0 && <Alert className="mb-2">{message}</Alert>}
+      {message.length > 0 && (
+        <Alert className="d-block mb-2" variant="success">
+          {message}
+        </Alert>
+      )}
 
       <Form.Text muted className="d-block">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="me-1 bi bi-info-circle" viewBox="0 0 16 16">
           <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
           <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
         </svg>
-        Recevoir le devis estimé n'est pas une demande pour nos services. Si vous voulez qu'on vous sert réelement, il faut soumettre le devis.
+        {"Recevoir le devis estimé n'est pas une demande pour nos services. Si vous voulez qu'on vous sert réelement, il faut soumettre le devis."}
       </Form.Text>
     </Form>
   )
@@ -208,7 +215,7 @@ const FormPrice = ({ price }: PropsFormPrice) => {
   return (
     <>
       <Form.Check label={price.description} id={`${checkboxId}${price.id}`} onChange={onChange} className="mb-3" type="checkbox" />
-      {checked && price.extraPrice && price.extraPrice > 0 ? (
+      {checked && price.extraPrice > 0 ? (
         <FloatingLabel label="Quantité">
           <Form.Control placeholder="90" id={`${extrapriceId}${price.id}`} type="number" min={1} defaultValue={1} required />
         </FloatingLabel>
@@ -247,8 +254,8 @@ type Props = {
 const Component = ({ prices }: Props) => {
   return (
     <>
-      <h2 id="estimation" className="conthrax">
-        <a href="#estimation">Faire une estimation de prix</a>
+      <h2 id="devis" className="conthrax">
+        <a href="#devis">Demander mon devis</a>
       </h2>
 
       <section className="py-3 py-sm-5">

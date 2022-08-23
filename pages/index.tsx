@@ -1,13 +1,14 @@
-import type { InferGetStaticPropsType, NextPage } from "next"
 import Head from "next/head"
 import { Workbox } from "workbox-window"
 import { useEffect } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
-import PriceLayout from "@components/home/bills"
+import BillLayout from "@components/home/bills"
 import { getPrices, getServices } from "@libs/firebase"
 import { exploitableServicesData, exploitablePricesData, logger } from "@libs/helpers"
+
+import type { InferGetStaticPropsType, NextPage } from "next"
 
 const title = sitename + " - Le coursier de Tahiti et ses îles"
 
@@ -18,24 +19,15 @@ const MainLayout = () => {
 
       <section className="py-3 py-sm-5">
         <p className="text-indent">
+          {"Vous êtes "}
+          <span className="text-primary fw-semibold">fiu</span>
+          {" des bouchons "}
+          <span className="text-primary fw-semibold">fiu</span>
           {
-            "Avez-vous déjà été bloqué dans les embouteillages, ou avez-vous dû planifier un voyage qui dépendait de la météo, et avez-vous déjà souhaité que tous vos colis soient livrés à votre porte ? Il ne s'agit pas seulement de commodité. C'est une question de sécurité et de tranquillité d'esprit. Vous ne voulez pas être absent de la ville lorsqu'une livraison importante arrive, n'est-ce pas ?"
+            " de vous déplacer car votre travail, votre vie familiale ou votre vie sociale vous prend du temps. Conscient désormais qu’à certaines heures de la journée circuler en ville peut devenir un calvaire. C’est parfois le cas dans d’autres communes."
           }
         </p>
-        <p className="text-indent">
-          {
-            "Imaginez un monde où vous n'avez pas à craindre de manquer un colis important à cause de la météo. Imaginez que vous puissiez recevoir toutes vos livraisons dans un lieu sécurisé qui vous convienne, à vous et à votre emploi du temps. Ce monde est possible avec "
-          }
-          <span className="fw-bold text-primary">{sitename}</span>
-          {
-            ". Nous proposons des services de livraison pour toutes sortes de produits, des produits alimentaires aux fournitures de bureau en passant par les gros appareils électroménagers, et bien plus encore."
-          }
-        </p>
-        <p className="text-indent">
-          {
-            "Que vous ayez besoin d'une livraison ou que vous souhaitiez simplement que quelqu'un s'en occupe pour vous, nous avons ce qu'il vous faut ! Nous offrons à la fois des options de ramassage et de livraison locaux, donc si vous cherchez quelqu'un qui peut ramasser vos courses au magasin ou les livrer directement à votre porte depuis Tahiti ou dans les îles, nous avons ce qu'il faut !"
-          }
-        </p>
+        <p className="text-indent">{"Notre mission est de vous éviter tous les tracas liés aux déplacements sur l’ensemble de l’île de Tahiti."}</p>
       </section>
     </>
   )
@@ -49,7 +41,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
         if ("serviceWorker" in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations()
           for (const registration of registrations) {
-            logger( "unregister sw", await registration.unregister())
+            logger("unregister sw", await registration.unregister())
           }
         }
       }
@@ -90,7 +82,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       </Head>
       <MainLayout />
       <ServiceLayout services={props.services} />
-      <PriceLayout prices={props.prices} />
+      <BillLayout prices={props.prices} />
     </main>
   )
 }

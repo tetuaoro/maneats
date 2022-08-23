@@ -1,7 +1,7 @@
 import type { ServiceData, PriceData } from "./firebase"
 
-export const exploitableServicesData = (data: ServiceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis(), updatedAt: d.updatedAt?.toMillis() }))
-export const exploitablePricesData = (data: PriceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis(), updatedAt: d.updatedAt?.toMillis() }))
+export const exploitableServicesData = (data: ServiceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis() || Date.now(), updatedAt: d.updatedAt?.toMillis() || Date.now() }))
+export const exploitablePricesData = (data: PriceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis() || Date.now(), updatedAt: d.updatedAt?.toMillis() || Date.now() }))
 
 export const getFormatedFilenameDate = () => {
   const date = new Date()

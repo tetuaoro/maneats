@@ -51,15 +51,14 @@ const MyModal = (props: PropsWithChildren) => {
       const extraPrice = form.querySelector<HTMLInputElement>("[name=extraPrice]")?.value
       const promotion = form.querySelector<HTMLInputElement>("[name=promotion]")?.value
 
-      if (!group || !description || !price) throw new Error("no valid data !")
+      if (!group || !description || !price || !extraPrice || !promotion) throw new Error("no valid data !")
       let data: PriceData = {
         group,
         description,
         price: parseIntWithThrow(price),
+        extraPrice: parseIntWithThrow(extraPrice),
+        promotion: parseIntWithThrow(promotion),
       }
-
-      if (extraPrice && parseIntWithThrow(extraPrice) > 0) data["extraPrice"] = parseIntWithThrow(extraPrice)
-      if (promotion && parseIntWithThrow(promotion) > 0) data["promotion"] = parseIntWithThrow(promotion)
 
       await _addPrice(data)
       await updatePriceDataState()
@@ -114,14 +113,14 @@ const MyModal = (props: PropsWithChildren) => {
             </Form.Group>
             <Form.Group className="mb-3" controlId="extraPrice">
               <Form.Label>Prix extra</Form.Label>
-              <Form.Control name="extraPrice" type="number" min={1} />
+              <Form.Control name="extraPrice" type="number" min={0} defaultValue={0} />
               <Form.Text id="extraPriceHelpBlock" muted>
                 {"Représente le prix à chaque augmentation au lieu du prix normal."}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="promotion">
               <Form.Label>Promotion/Réduction</Form.Label>
-              <Form.Control name="promotion" type="number" min={1} />
+              <Form.Control name="promotion" type="number" min={0} defaultValue={0} />
               <Form.Text id="promotionHelpBlock" muted>
                 {"Représente le prix de réduction par rapport au prix normal et est un prix fixé (pas de pourcentage)."}
               </Form.Text>
@@ -209,7 +208,7 @@ const MyTable = () => {
   return (
     <Table responsive="sm" className="mt-5">
       <thead>
-        <tr>
+        <tr className="border-bottom border-dark">
           <th className="text-nowrap">Action</th>
           <th className="text-nowrap">Désignation</th>
           <th className="text-nowrap">Description</th>
@@ -259,13 +258,13 @@ const MyTable = () => {
                 <textarea onKeyDown={onKeyDown} onInput={onInput} onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={description} name="description" />
               </td>
               <td>
-                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={price && price > 0 ? price : ""} name="price" min="0" type="number" />
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={price > 0 ? price : ""} name="price" min={0} type="number" />
               </td>
               <td>
-                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={extraPrice && extraPrice > 0 ? extraPrice : ""} name="extraPrice" min="0" type="number" />
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={extraPrice > 0 ? extraPrice : ""} name="extraPrice" min={0} type="number" />
               </td>
               <td>
-                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={promotion && promotion > 0 ? promotion : ""} name="promotion" min="0" type="number" />
+                <input onBlur={(e: any) => onBlur(e, id)} className={styles.input} defaultValue={promotion > 0 ? promotion : ""} name="promotion" min={0} type="number" />
               </td>
             </tr>
           ))}

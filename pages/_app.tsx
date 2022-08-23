@@ -9,13 +9,13 @@ import Footer from "@components/footer"
 function App({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter()
 
-  const isDashboard = pathname.startsWith("/dashboard")
+  const isEmbed = pathname.startsWith("/dashboard") || pathname.startsWith("/offline")
 
   return (
     <RecoilRoot>
-      {!isDashboard && <Header />}
+      {!isEmbed && <Header />}
       <Component {...pageProps} />
-      {!isDashboard && <Footer />}
+      {!isEmbed && <Footer />}
     </RecoilRoot>
   )
 }

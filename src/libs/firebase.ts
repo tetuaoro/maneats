@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { onSnapshot, getDocs, increment, updateDoc, Timestamp, query, where, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
+import { onSnapshot, getDocs, increment, deleteDoc, updateDoc, Timestamp, query, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, updatePassword } from "firebase/auth"
 import { logger } from "./helpers"
@@ -7,14 +7,16 @@ import { logger } from "./helpers"
 import type { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import type { NextOrObserver, User } from "firebase/auth"
 
+const isServer = typeof window === "undefined"
+
 const firebaseConfigClientSide = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
+  apiKey: isServer ? process.env.FIREBASE_API_KEY || "" : process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+  authDomain: isServer ? process.env.FIREBASE_AUTH_DOMAIN || "" : process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
+  projectId: isServer ? process.env.FIREBASE_PROJECT_ID || "" : process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
+  storageBucket: isServer ? process.env.FIREBASE_STORAGE_BUCKET || "" : process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: isServer ? process.env.FIREBASE_MESSAGING_SENDER_ID || "" : process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: isServer ? process.env.FIREBASE_APP_ID || "" : process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+  measurementId: isServer ? process.env.FIREBASE_MEASUREMENT_ID || "" : process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
 }
 
 const app = initializeApp(firebaseConfigClientSide)
@@ -42,30 +44,21 @@ export interface Image {
   height: number
 }
 export interface ServiceData {
+  id?: string
   name: string
-  public?: boolean
   image: Image
   description: string
   createdAt?: Timestamp
   updatedAt?: Timestamp
-  id?: string
 }
 
-export type CurrencyType = "XPF" | "EUR" | "USD"
-type CurrencyFieldType = {
-  XPF: CurrencyType
-  EUR: CurrencyType
-  USD: CurrencyType
-}
-export const CurrencyField: CurrencyFieldType = { XPF: "XPF", EUR: "EUR", USD: "USD" }
 export interface PriceData {
   id?: string
   group: string
   description: string
   price: number
-  extraPrice?: number
-  promotion?: number
-  public?: boolean
+  extraPrice: number
+  promotion: number
   createdAt?: Timestamp
   updatedAt?: Timestamp
 }
@@ -74,12 +67,12 @@ export type BillDataRefType = {
   group: string
   description: string
   extraPrice: number
+  promotion: number
   size: string
 }
 export interface BillData {
   id?: string
   fullname: string
-  public?: boolean
   phone: string
   refs: BillDataRefType[]
   total: number
@@ -157,7 +150,7 @@ export const getAccount = async () => {
 
 export const getServices = async () => {
   try {
-    const q = query(collection(db, SERVICES_REF), where("public", "==", true))
+    const q = query(collection(db, SERVICES_REF), orderBy("createdAt"))
     const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("services empty !")
     const data: ServiceData[] = []
@@ -166,7 +159,7 @@ export const getServices = async () => {
       docData["id"] = doc.id
       data.push(docData)
     })
-    return data.sort((a, b) => (a.createdAt && b.createdAt && a.createdAt.valueOf() < b.createdAt.valueOf() ? 0 : 1))
+    return data
   } catch (error) {
     throw error
   }
@@ -174,7 +167,7 @@ export const getServices = async () => {
 
 export const addService = async (data: ServiceData) => {
   try {
-    data = { ...data, public: true, createdAt: Timestamp.now() }
+    data = { ...data, createdAt: Timestamp.now() }
     await addDoc(collection(db, SERVICES_REF), data)
   } catch (error) {
     throw error
@@ -184,8 +177,7 @@ export const addService = async (data: ServiceData) => {
 export const removeService = async (id: string) => {
   try {
     const serviceDoc = doc(collection(db, SERVICES_REF), id)
-    const docData = { public: false, updatedAt: Timestamp.now() }
-    await setDoc(serviceDoc, docData, { merge: true })
+    await deleteDoc(serviceDoc)
   } catch (error) {
     throw error
   }
@@ -229,7 +221,7 @@ export const updateServiceImage = async (image: Image, file: Blob, data: Service
 
 export const getPrices = async () => {
   try {
-    const q = query(collection(db, PRICES_REF), orderBy("group"), where("public", "==", true))
+    const q = query(collection(db, PRICES_REF), orderBy("group"))
     const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("prices empty !")
     const data: PriceData[] = []
@@ -246,7 +238,7 @@ export const getPrices = async () => {
 
 export const addPrice = async (data: PriceData) => {
   try {
-    data = { ...data, public: true, createdAt: Timestamp.now() }
+    data = { ...data, createdAt: Timestamp.now() }
     await addDoc(collection(db, PRICES_REF), data)
   } catch (error) {
     throw error
@@ -256,8 +248,7 @@ export const addPrice = async (data: PriceData) => {
 export const removePrice = async (id: string) => {
   try {
     const priceDoc = doc(collection(db, PRICES_REF), id)
-    const docData = { public: false, updatedAt: Timestamp.now() }
-    await setDoc(priceDoc, docData, { merge: true })
+    await deleteDoc(priceDoc)
   } catch (error) {
     throw error
   }
@@ -277,7 +268,7 @@ export const updatePrice = async (data: Partial<PriceData>, id: string) => {
 
 export const getBills = async () => {
   try {
-    const q = query(collection(db, BILLS_REF), orderBy("createdAt", "desc"), where("public", "==", true))
+    const q = query(collection(db, BILLS_REF), orderBy("createdAt", "desc"))
     const docsSnap = await getDocs(q)
     if (docsSnap.empty) throw new Error("bills empty !")
     const data: BillData[] = []
@@ -302,17 +293,17 @@ export const getBill = async (id: string) => {
   }
 }
 
-const counterID = "JDdeJ7O90Joj"
+const counterID = "QgUw5KNLMtUviRxovIbL"
 export const addBill = async (data: BillData, incBill: boolean) => {
   try {
-    data = { ...data, public: incBill, createdAt: Timestamp.now() }
-    const _doc = await addDoc(collection(db, BILLS_REF), data)
+    data = { ...data, createdAt: Timestamp.now() }
+    await addDoc(collection(db, BILLS_REF), data)
     try {
       if (incBill) await updateDoc(doc(db, COUNTER_REF, counterID), { counter: increment(1) })
     } catch (error) {
       if (incBill) await setDoc(doc(db, COUNTER_REF, counterID), { counter: 1 })
     }
-    return _doc
+    return data
   } catch (error) {
     throw error
   }
@@ -321,8 +312,7 @@ export const addBill = async (data: BillData, incBill: boolean) => {
 export const getBillCounter = async () => {
   try {
     const _doc = await getDoc(doc(db, COUNTER_REF, counterID))
-    if (_doc.exists()) return (_doc.data() as BillCounter).counter
-    return 0
+    return _doc.exists() ? (_doc.data() as BillCounter).counter : 0
   } catch (error) {
     throw error
   }

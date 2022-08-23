@@ -65,12 +65,16 @@ const FormModal = (props: PropsWithChildren) => {
             if (!priceData) return
             total += priceData.price
             const inputExtraPrice = current.querySelector(`#${extrapriceId}${id}`) as HTMLInputElement | null
-            if (inputExtraPrice && parseIntWithThrow(inputExtraPrice.value) > 1 && priceData.extraPrice && priceData.extraPrice > 1)
-              total += priceData.extraPrice * (parseIntWithThrow(inputExtraPrice.value) - (priceData.price > 0 ? 1 : 0))
+            if (inputExtraPrice) {
+              const priceThrow = parseIntWithThrow(inputExtraPrice.value)
+              if (priceThrow > 1 && priceData.extraPrice > 1) total += priceData.extraPrice * (priceThrow - (priceData.price > 0 ? 1 : 0))
+            }
+            if (priceData.promotion > 0) total -= priceData.promotion
             refs.push({
               group: priceData.group.replace(/^\d+(\W|)/, ""),
               description: priceData.description,
-              extraPrice: priceData.extraPrice || 0,
+              extraPrice: priceData.extraPrice,
+              promotion: priceData.promotion,
               size: inputExtraPrice ? inputExtraPrice.value : "1",
             })
           }
@@ -96,7 +100,7 @@ const FormModal = (props: PropsWithChildren) => {
         total,
       }
 
-      await _addBill(data)
+      await _addBill(data, false)
       await updateBillDataState()
     } catch (error) {
       modalError(error)
@@ -194,22 +198,22 @@ const FormModal = (props: PropsWithChildren) => {
 }
 
 type PropsFormPrice = {
-  data: PriceData
+  price: PriceData
 }
 
 const checkboxId = "checkbox-"
 const extrapriceId = "extraprice-"
 
-const FormPrice = ({ data }: PropsFormPrice) => {
+const FormPrice = ({ price }: PropsFormPrice) => {
   const [checked, setChecked] = useState(false)
   const onChange = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked)
 
   return (
     <>
-      <Form.Check label={data.description} id={`${checkboxId}${data.id}`} onChange={onChange} className="mb-3" type="checkbox" />
-      {checked && data.extraPrice && data.extraPrice > 0 ? (
+      <Form.Check label={price.description} id={`${checkboxId}${price.id}`} onChange={onChange} className="mb-3" type="checkbox" />
+      {checked && price.extraPrice > 0 ? (
         <FloatingLabel label="Quantité">
-          <Form.Control placeholder="90" id={`${extrapriceId}${data.id}`} type="number" min={1} defaultValue={1} required />
+          <Form.Control placeholder="90" id={`${extrapriceId}${price.id}`} type="number" min={1} defaultValue={1} required />
         </FloatingLabel>
       ) : (
         ""
@@ -236,7 +240,7 @@ const FormPrices = ({ prices }: PropsFormPrices) => {
         <div key={k1}>
           <div className="text-decoration-underline">{group[0].group}</div>
           {group.map((price, k2) => (
-            <FormPrice key={k2} data={price} />
+            <FormPrice key={k2} price={price} />
           ))}
         </div>
       ))}
@@ -255,7 +259,9 @@ const MyTable = () => {
           <th className="text-nowrap">Nom complet</th>
           <th className="text-nowrap">Téléphone</th>
           <th className="text-nowrap">Prix Total</th>
-          <th className="text-nowrap" title="Désignation / description / nombre">Détails</th>
+          <th className="text-nowrap" title="Désignation / description / nombre">
+            Détails
+          </th>
           <th className="text-nowrap">Commentaire</th>
         </tr>
       </thead>

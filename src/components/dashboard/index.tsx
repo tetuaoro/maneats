@@ -20,7 +20,7 @@ const LoginBtn = () => {
     try {
       auth && (await signOutMe())
     } catch (error) {
-      setModal({ text: "Une erreur est survenue !", variant: "danger" })
+      setModal({ text: error instanceof Error ? error.message : "Une erreur est survenue !", variant: "danger" })
     }
   }
   return (

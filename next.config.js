@@ -25,11 +25,7 @@ const withWorkbox = (nextConfig = {}) => {
         config: { workbox: { dest = "public", force = false, modifyURLPrefix = {}, swDest = "sw.js", swSrc = false, ...workboxOptions } = {} },
       } = options
 
-      if (isServer) {
-        return config
-      }
-
-      if (dev && !force) {
+      if (isServer || !force) {
         console.log("> Progressive Web App is disabled")
         return config
       }

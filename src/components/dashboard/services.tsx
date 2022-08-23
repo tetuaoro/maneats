@@ -172,9 +172,9 @@ const Component = () => {
         <Card className="mt-5 shadow">
           <Card.Body>
             <span>Aucun service. </span>
-            <span onClick={addService} className="link-info">
+            <a href="#" onClick={addService} className="link-info">
               Ajouter en un
-            </span>
+            </a>
           </Card.Body>
         </Card>
       )}
