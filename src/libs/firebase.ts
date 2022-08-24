@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app"
 import { onSnapshot, getDocs, increment, deleteDoc, updateDoc, Timestamp, query, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, updatePassword } from "firebase/auth"
-import { logger } from "./helpers"
+import { getBillName, logger } from "./helpers"
 
 import type { DocumentData, DocumentSnapshot } from "firebase/firestore"
 import type { NextOrObserver, User } from "firebase/auth"
@@ -77,6 +77,7 @@ export interface BillData {
   refs: BillDataRefType[]
   total: number
   comment: string
+  billname?: string
   createdAt?: Timestamp
 }
 
@@ -296,7 +297,8 @@ export const getBill = async (id: string) => {
 const counterID = "QgUw5KNLMtUviRxovIbL"
 export const addBill = async (data: BillData, incBill: boolean) => {
   try {
-    data = { ...data, createdAt: Timestamp.now() }
+    const billname = await getBillName()
+    data = { ...data, billname, createdAt: Timestamp.now() }
     await addDoc(collection(db, BILLS_REF), data)
     try {
       if (incBill) await updateDoc(doc(db, COUNTER_REF, counterID), { counter: increment(1) })

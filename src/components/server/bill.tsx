@@ -1,30 +1,89 @@
 import { join, resolve } from "path"
 import { readdirSync } from "fs"
-import { Document, Page, Text, Link, StyleSheet, Image } from "@react-pdf/renderer"
+import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer"
 import { BillData } from "@libs/firebase"
+import { sitename } from "@libs/app"
 
 type Props = {
   bill: BillData
-  counter: number
 }
 
-const Bill = ({ bill, counter }: Props) => {
+const Bill = ({ bill }: Props) => {
   const pdfFiles = "images"
   const dir = resolve("./public", pdfFiles)
   const filenames = readdirSync(dir)
   const images = filenames.map((name) => join(dir, name))
-  const sourceFile = images.find((img) => img.includes("couverture.png")) || ""
+  const headImg = images.find((img) => img.includes("server-head.png")) || ""
+
+  const createdAt = new Date()
+
   return (
     <Document language="fr">
       <Page style={styles.body}>
-        <Text style={styles.header} fixed>
-          rao web
-        </Text>
-        <Image style={styles.image} src={sourceFile} />
-        <Text style={styles.title}>FACTURE n°{counter || 0}</Text>
-        <Text style={styles.abvsign}>{"Fait le _____________________ à _____________________ en (1) un exemplaire."}</Text>
-        <Text style={styles.sign}>{"Le Concepteur                               Le Client"}</Text>
-        <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} fixed />
+        <View style={styles.row}>
+          <View style={styles.rowCol1}>
+            <Image style={styles.image} src={headImg} />
+            <Text style={styles.titleHead}>{sitename}</Text>
+            <View style={styles.subtitleHead}>
+              <Text>N° tahiti : 919373 RCS: 091541A</Text>
+              <Text>Tahiti Papeete 98714</Text>
+              <Text>Polynésie Française</Text>
+            </View>
+          </View>
+          <View style={styles.rowCol2}>
+            <Text style={{ fontSize: 32, marginBottom: 5 }}>FACTURE</Text>
+            <Text style={{ fontSize: 14, marginBottom: 10 }}>{bill.billname || "#FAC-0003i"}</Text>
+            <Text style={{ fontSize: 10 }}>Solde dû</Text>
+            <Text>{`XPF ${bill.total}`}</Text>
+          </View>
+        </View>
+        <View style={styles.row2}>
+          <View style={styles.row2Col1}>
+            <Text style={{ marginTop: 16 }}>Facturer à</Text>
+            <Text>{bill.fullname}</Text>
+          </View>
+          <View style={styles.row2Col2}>
+            <View style={styles.row2}>
+              <View style={styles.row2Col2}>
+                <Text style={{ marginBottom: 5 }}>Date de facture :</Text>
+                <Text style={{ marginBottom: 5 }}>Conditions :</Text>
+                <Text style={{ marginBottom: 5 }}>{"Date d'échéance :"}</Text>
+              </View>
+              <View style={styles.row2Col2}>
+                <Text style={{ marginBottom: 5 }}>{createdAt.toLocaleDateString()}</Text>
+                <Text style={{ marginBottom: 5 }}>Payable à réception</Text>
+                <Text style={{ marginBottom: 5 }}>{createdAt.toLocaleDateString()}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View style={styles.table}>
+          <View style={styles.trhead}>
+            <Text style={styles.th1}>#</Text>
+            <Text style={styles.th2}>{"Article & Description"}</Text>
+            <Text style={styles.th3}>{"Quantité"}</Text>
+          </View>
+          {bill.refs.map((b, k) => (
+            <View style={styles.trbody} key={k}>
+              <Text style={styles.td1}>{k + 1}</Text>
+              <Text style={styles.td2}>{`${b.group} ${b.description}`}</Text>
+              <Text style={styles.td3}>{b.size}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.row2}>
+          <View style={styles.row2Col1}></View>
+          <View style={styles.row2Col2}>
+            <View style={styles.row2}>
+              <View style={styles.row2Col2}>
+                <Text style={{ fontSize: 16, marginTop: 20, backgroundColor: "#bdbdbd", padding: 2 }}>Total</Text>
+              </View>
+              <View style={styles.row2Col2}>
+                <Text style={{ fontSize: 16, marginTop: 20, backgroundColor: "#bdbdbd", padding: 2 }}>{`XPF ${bill.total}`}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
       </Page>
     </Document>
   )
@@ -36,84 +95,107 @@ const styles = StyleSheet.create({
     paddingBottom: 65,
     paddingHorizontal: 35,
   },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 32,
+  },
+  row2: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 3,
+    fontSize: 10,
+  },
+  rowCol1: {
+    width: "40%",
+    textAlign: "left",
+  },
+  rowCol2: {
+    width: "60%",
+    textAlign: "right",
+  },
+  row2Col1: {
+    width: "50%",
+    textAlign: "left",
+  },
+  row2Col2: {
+    width: "50%",
+    textAlign: "right",
+  },
+  /* row 1 */
   image: {
-    marginVertical: 15,
-    marginHorizontal: 100,
+    width: "100%",
   },
-  title: {
-    fontSize: 24,
-    textAlign: "center",
-  },
-  author: {
+  titleHead: {
     fontSize: 12,
+  },
+  subtitleHead: {
+    fontSize: 10,
+    color: "gray",
+  },
+  /* table head */
+  table: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+  },
+  trhead: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    flexWrap: "wrap",
+    color: "white",
+    backgroundColor: "black",
+    fontSize: 10,
+  },
+  th1: {
+    width: "10%",
+    borderRight: 1,
+    borderRightColor: "gray",
+    padding: 2,
+  },
+  th2: {
+    width: "60%",
+    borderRight: 1,
+    borderRightColor: "gray",
+    padding: 2,
+  },
+  th3: {
+    width: "30%",
+    padding: 2,
+  },
+  /* table body */
+  trbody: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: "100%",
+    fontSize: 10,
+  },
+  td1: {
+    width: "10%",
+    borderTop: 1,
+    borderRight: 1,
+    borderRightColor: "gray",
+    padding: 2,
     textAlign: "center",
-    marginBottom: 40,
   },
-  subtitle: {
-    fontSize: 18,
-    margin: 12,
-  },
-  article: {
-    fontSize: 14,
-    margin: 9,
-    fontFamily: "Times-Bold",
-  },
-  bold: {
-    fontFamily: "Times-Bold",
-  },
-  highLight: {
-    backgroundColor: "#E2F8F9",
-  },
-  link: {
-    fontSize: 14,
-    textDecoration: "none",
-    fontFamily: "Times-Italic",
-  },
-  text: {
-    margin: 12,
-    fontSize: 14,
-    textAlign: "justify",
-    fontFamily: "Times-Roman",
-  },
-  abvsign: {
-    marginTop: 50,
-    marginBottom: 12,
-    fontSize: 14,
+  td2: {
+    width: "60%",
+    borderTop: 1,
+    borderRight: 1,
+    borderRightColor: "gray",
+    padding: 2,
     textAlign: "center",
-    fontFamily: "Times-Roman",
   },
-  sign: {
-    fontSize: 14,
+  td3: {
+    width: "30%",
+    borderTop: 1,
+    borderRightColor: "gray",
+    padding: 2,
     textAlign: "center",
-    fontFamily: "Times-Roman",
-  },
-  paragraph: {
-    margin: 6,
-    fontSize: 14,
-    textAlign: "justify",
-    fontFamily: "Times-Roman",
-  },
-  list: {
-    margin: 3,
-    fontSize: 14,
-    textIndent: 10,
-    textAlign: "justify",
-    fontFamily: "Times-Roman",
-  },
-  header: {
-    fontSize: 12,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "grey",
-  },
-  pageNumber: {
-    position: "absolute",
-    fontSize: 12,
-    bottom: 30,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    color: "grey",
   },
 })
 

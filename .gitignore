@@ -39,3 +39,4 @@ public/workbox*
 public/site.webmanifest
 certificates/*
 server.js
+/pages/api/bill.ts

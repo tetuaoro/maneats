@@ -1,13 +1,12 @@
 import { renderToStream } from "@react-pdf/renderer"
 import { createTransport } from "nodemailer"
-import { email } from "@libs/app"
-import { getBillCounter } from "@libs/firebase"
 import Bill from "@components/server/bill"
+import { email } from "@libs/app"
+import { logger, getFormatedFilenameDate } from "@libs/helpers"
 
-import { BillData } from "@libs/firebase"
+import type { BillData } from "@libs/firebase"
 import type { NextApiRequest, NextApiResponse } from "next"
 import type { Options, SentMessageInfo } from "nodemailer/lib/smtp-transport"
-import { logger, getFormatedFilenameDate } from "@libs/helpers"
 
 const from = "noreply@rao-nagos.pf"
 const mailConfig: Options = {
@@ -34,8 +33,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const { email: emailClient, bill, sendbill } = req.body as BodyResponseType
 
-    logger(req.body)
-
     const callBackTransporter = (error: Error | null, info: SentMessageInfo) => {
       if (error) {
         logger("transporter logger error", error)
@@ -47,8 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      const counter = await getBillCounter()
-      const content = (await renderToStream(Bill({ bill, counter }))) as any
+      const content = (await renderToStream(Bill({ bill }))) as any
 
       let mailOptions: any = {
         from: `Do not Reply <${from}>`,
@@ -65,7 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ],
       }
 
-      if (sendbill) mailOptions["bcc"] = '"Pro ça" <tetuaoropro@gmail.com>'
+      if (sendbill) mailOptions["bcc"] = `"Pro ça" <${email}>`
 
       transporter.sendMail(mailOptions, callBackTransporter)
     } catch (error) {

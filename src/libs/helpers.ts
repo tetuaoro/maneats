@@ -1,3 +1,5 @@
+import { getBillCounter } from "./firebase"
+
 import type { ServiceData, PriceData } from "./firebase"
 
 export const exploitableServicesData = (data: ServiceData[]) => data.map((d) => ({ ...d, createdAt: d.createdAt?.toMillis() || Date.now(), updatedAt: d.updatedAt?.toMillis() || Date.now() }))
@@ -7,6 +9,18 @@ export const getFormatedFilenameDate = () => {
   const date = new Date()
   const concat = date.toDateString() + " " + date.getHours() + " " + date.getMinutes()
   return concat.replaceAll(" ", "_")
+}
+
+export const getBillName = async () => {
+  const nd = new Date()
+  const year = nd.getFullYear()
+  const month = nd.getMonth() + 1
+  try {
+    const billCounter = await getBillCounter()
+    return `# FAC${year}${month}-${billCounter + 1}`
+  } catch (error) {
+    return `# FAC${year}${month}-0002`
+  }
 }
 
 export const logger = (...params: any[]) => {

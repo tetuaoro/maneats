@@ -29,8 +29,8 @@ const Component = (props: Props) => {
             </Col>
             <Col sm={6}>
               <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-                <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id={service.name.replace(" ", "").toLowerCase()}>
-                  <a href={`#${service.name.replace(" ", "").toLowerCase()}`}>- {service.name}</a>
+                <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id={service.name.replaceAll(" ", "").toLowerCase()}>
+                  <a href={`#${service.name.replaceAll(" ", "").toLowerCase()}`}>- {service.name}</a>
                 </h3>
                 <p>{service.description}</p>
               </article>

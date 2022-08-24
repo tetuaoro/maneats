@@ -59,7 +59,7 @@ const FormLayout = ({ prices }: Props) => {
 
       if (!fullname || !phone) throw new Error("Le nom et le téléphone sont requis !")
 
-      let data: BillData = {
+      const data: BillData = {
         fullname,
         phone,
         refs,
@@ -87,7 +87,7 @@ const FormLayout = ({ prices }: Props) => {
       const { submitter } = e.nativeEvent as any
       const sendbill = submitter.id === "send-bill"
       const bill = await addBill(sendbill)
-      const { status, text } = await fetch("/api/sendmail", {
+      const { status } = await fetch("/api/sendmail", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -96,7 +96,7 @@ const FormLayout = ({ prices }: Props) => {
         body: JSON.stringify({ email, bill, sendbill }),
       })
 
-      if (status >= 400) throw new Error(await text())
+      if (status >= 400) throw new Error(`status ${status}`)
 
       setValidated(false)
       setError("")

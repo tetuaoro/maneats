@@ -16,7 +16,7 @@ const Header = () => {
         <Container fluid>
           <Link href="/">
             <Navbar.Brand href="/">
-              <Image priority alt={`Logo de ${sitename}`} src={logo} width={60} height={60} />
+              <Image priority alt={`Logo de ${sitename}`} src={logo} width={160} height={60} />
             </Navbar.Brand>
           </Link>
           <Navbar.Text as="section" className="d-flex justify-content-center me-sm-5">
