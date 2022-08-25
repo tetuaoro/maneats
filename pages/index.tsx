@@ -1,12 +1,13 @@
 import Head from "next/head"
 import { Workbox } from "workbox-window"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
 import BillLayout from "@components/home/bills"
 import { getPrices, getServices } from "@libs/firebase"
 import { exploitableServicesData, exploitablePricesData, logger } from "@libs/helpers"
+import CookieConsent from "react-cookie-consent"
 
 import type { InferGetStaticPropsType, NextPage } from "next"
 
@@ -34,6 +35,16 @@ const MainLayout = () => {
 }
 
 const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) => {
+  const [showCookies, setShowCookies] = useState(false)
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setShowCookies(true)
+    }, 11000)
+
+    return () => clearTimeout(id)
+  })
+
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_PWA_ENABLED) {
       logger("warn", "Pwa support is disabled")
@@ -83,6 +94,11 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       <MainLayout />
       <ServiceLayout services={props.services} />
       <BillLayout prices={props.prices} />
+      {showCookies && (
+        <CookieConsent expires={180} cookieName="acceptcgu" buttonText="Bien sûr" buttonStyle={{ color: "white", backgroundColor: "var(--bs-primary)" }}>
+          {"Parcourir le site signifie que vous acceptez les conditions d'utilisation."}
+        </CookieConsent>
+      )}
     </main>
   )
 }

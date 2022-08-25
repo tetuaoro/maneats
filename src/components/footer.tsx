@@ -1,6 +1,7 @@
 import { Container, Nav } from "react-bootstrap"
 import { email, fbId, raoLink, sitename, telephone } from "@libs/app"
 import { useFacebookURL } from "@libs/hooks"
+import Link from "next/link"
 
 const Footer = () => {
   const [fb_url] = useFacebookURL()
@@ -28,14 +29,11 @@ const Footer = () => {
       <Container fluid className="d-flex justify-content-center">
         <Nav>
           <Nav.Item>
-            <Nav.Link href="#" className="small">
-              Conditions
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="#" className="small">
-              {"Confidentialité"}
-            </Nav.Link>
+            <Link href="/rgpd">
+              <Nav.Link href="/rgpd" className="small">
+                {"Conditions & Confidentialité"}
+              </Nav.Link>
+            </Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link className="small position-relative" href={`${raoLink}`} target="_blank" rel="noopener noreferrer">

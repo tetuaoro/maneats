@@ -171,6 +171,8 @@ const FormLayout = ({ prices }: Props) => {
           <Form.Control aria-label={"ex : " + `${email}`} aria-describedby="basic-addon2" name="email" type="email" placeholder={"ex : " + `${email}`} required />
         </InputGroup>
       </Form.Group>
+      <Form.Text>{"Nous collectons ces données afin de vous adresser par courriel le devis que vous avez sollicité."}</Form.Text>
+      <Form.Check required label={"J'accepte de partager mes informations confidentielles"} id={"emailok"} className="mb-3" type="checkbox" />
       <Button className="me-3 mb-2" variant="dark" type="submit">
         Recevoir uniquement le devis estimé
       </Button>
