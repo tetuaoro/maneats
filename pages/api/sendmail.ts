@@ -61,7 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ],
       }
 
-      if (sendbill) mailOptions["bcc"] = `"Pro ça" <${email}>`
+      if (sendbill /* && process.env.NODE_ENV === "production" */) mailOptions["cc"] = `"Manea tahiti services" <${email}>`
 
       transporter.sendMail(mailOptions, callBackTransporter)
     } catch (error) {

@@ -31,6 +31,7 @@ const LoginBtn = () => {
 }
 
 const Navs = () => {
+  const auth = useRecoilValue(authState)
   const setRoute = useSetRecoilState(routeState)
   const handleClick = (id: RouteType) => setRoute(id)
 
@@ -39,26 +40,30 @@ const Navs = () => {
       <Nav.Item as="li">
         <LoginBtn />
       </Nav.Item>
-      <Nav.Item as="li">
-        <Nav.Link href="#compte" onClick={() => handleClick(RouteField.ACCOUNT)} className="py-3">
-          Compte
-        </Nav.Link>
-      </Nav.Item>
-      <Nav.Item as="li">
-        <Nav.Link href="#services" onClick={() => handleClick(RouteField.SERVICES)} className="py-3">
-          Services
-        </Nav.Link>
-      </Nav.Item>
-      <Nav.Item as="li">
-        <Nav.Link href="#prices" onClick={() => handleClick(RouteField.PRICES)} className="py-3">
-          Tarifs
-        </Nav.Link>
-      </Nav.Item>
-      <Nav.Item as="li">
-        <Nav.Link href="#bills" onClick={() => handleClick(RouteField.BILLS)} className={`position-relative py-3 ${styles.badge}`} data-badge={3}>
-          Devis/Factures
-        </Nav.Link>
-      </Nav.Item>
+      {auth && (
+        <>
+          <Nav.Item as="li">
+            <Nav.Link href="#compte" onClick={() => handleClick(RouteField.ACCOUNT)} className="py-3">
+              Compte
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item as="li">
+            <Nav.Link href="#services" onClick={() => handleClick(RouteField.SERVICES)} className="py-3">
+              Services
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item as="li">
+            <Nav.Link href="#prices" onClick={() => handleClick(RouteField.PRICES)} className="py-3">
+              Tarifs
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item as="li">
+            <Nav.Link href="#bills" onClick={() => handleClick(RouteField.BILLS)} className="py-3">
+              Devis/Factures
+            </Nav.Link>
+          </Nav.Item>
+        </>
+      )}
     </>
   )
 }

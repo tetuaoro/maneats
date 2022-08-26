@@ -96,7 +96,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       <BillLayout prices={props.prices} />
       {showCookies && (
         <CookieConsent expires={180} cookieName="acceptcgu" buttonText="Bien sûr" buttonStyle={{ color: "white", backgroundColor: "var(--bs-primary)" }}>
-          {"Parcourir le site signifie que vous acceptez les conditions d'utilisation."}
+          {"En poursuivant votre navigation, vous acceptez les conditions d'utilisation."}
         </CookieConsent>
       )}
     </main>

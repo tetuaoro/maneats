@@ -1,7 +1,7 @@
 import { useState, useRef, useContext, createContext } from "react"
 import { Button, Form, Modal, Table, FloatingLabel, InputGroup, Placeholder } from "react-bootstrap"
 import { useRecoilValueLoadable, useSetRecoilState } from "recoil"
-import { addBill as _addBill, getBills } from "@libs/firebase"
+import { addBill as _addBill, getBills, getBillPhoneCounter } from "@libs/firebase"
 import { logger, parseIntWithThrow } from "@libs/helpers"
 import { modalState, billsState, pricesState } from "@libs/atoms"
 import { telephone } from "@libs/app"
@@ -252,6 +252,17 @@ const MyTable = () => {
   const { state, contents } = useRecoilValueLoadable(billsState)
   const bills = contents as BillData[] | null
 
+  const setModal = useSetRecoilState(modalState)
+
+  const onClick = async (phone: string) => {
+    try {
+      const counter = await getBillPhoneCounter(phone)
+      setModal({ text: `Ce client a commandé ${counter} fois.`, variant: "info" })
+    } catch (error) {
+      setModal({ text: error instanceof Error ? error.message : "Une erreur est survenue !", variant: "danger" })
+    }
+  }
+
   return (
     <Table responsive="sm" className="mt-5">
       <thead>
@@ -288,7 +299,7 @@ const MyTable = () => {
         {state === "hasValue" &&
           bills &&
           bills.map((bill, k) => (
-            <tr key={k} className="border-bottom border-dark">
+            <tr key={k} className="border-bottom border-dark" onClick={() => onClick(bill.phone)}>
               <td>{bill.fullname}</td>
               <td>
                 <a className="link-success" href={`tel:+689${bill.phone}`}>

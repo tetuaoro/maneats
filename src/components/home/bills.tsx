@@ -67,7 +67,7 @@ const FormLayout = ({ prices }: Props) => {
         total,
       }
 
-      return await _addBill(data, inc)
+      return inc ? await _addBill(data): data
     } catch (error) {
       setError(error instanceof Error ? error.message : "Une erreur est survenue ! [8907]")
       throw error

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { onSnapshot, getDocs, increment, deleteDoc, updateDoc, Timestamp, query, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
+import { onSnapshot, getDocs, increment, deleteDoc, updateDoc, where, Timestamp, query, orderBy, collection, getFirestore, doc, getDoc, setDoc, addDoc } from "firebase/firestore"
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import { initializeAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged as _onAuthStateChanged, browserLocalPersistence, updatePassword } from "firebase/auth"
 import { getBillName, logger } from "./helpers"
@@ -295,16 +295,17 @@ export const getBill = async (id: string) => {
 }
 
 const counterID = "QgUw5KNLMtUviRxovIbL"
-export const addBill = async (data: BillData, incBill: boolean) => {
+export const addBill = async (data: BillData, incrementCounter = true) => {
   try {
     const billname = await getBillName()
     data = { ...data, billname, createdAt: Timestamp.now() }
     await addDoc(collection(db, BILLS_REF), data)
-    try {
-      if (incBill) await updateDoc(doc(db, COUNTER_REF, counterID), { counter: increment(1) })
-    } catch (error) {
-      if (incBill) await setDoc(doc(db, COUNTER_REF, counterID), { counter: 1 })
-    }
+    if (incrementCounter)
+      try {
+        await updateDoc(doc(db, COUNTER_REF, counterID), { counter: increment(1) })
+      } catch (error) {
+        await setDoc(doc(db, COUNTER_REF, counterID), { counter: 1 })
+      }
     return data
   } catch (error) {
     throw error
@@ -315,6 +316,16 @@ export const getBillCounter = async () => {
   try {
     const _doc = await getDoc(doc(db, COUNTER_REF, counterID))
     return _doc.exists() ? (_doc.data() as BillCounter).counter : 0
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getBillPhoneCounter = async (phone: string) => {
+  try {
+    const q = query(collection(db, BILLS_REF), where("phone", "==", phone))
+    const docsSnap = await getDocs(q)
+    return docsSnap.empty ? 0 : docsSnap.size
   } catch (error) {
     throw error
   }

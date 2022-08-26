@@ -27,7 +27,7 @@ const config = {
       name: "Demander un devis",
       short_name: "Devis",
       description: "Réaliser un devis afin d'estimer la facture finale.",
-      url: "/tarifs",
+      url: "/#devis",
       icons: [{ src: "/icons/file-earmark.png", sizes: "192x192", type: "image/png" }],
     },
   ],
