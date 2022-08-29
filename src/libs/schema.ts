@@ -33,7 +33,7 @@ const organization: WithContext<LocalBusiness> = {
   sameAs,
   description,
   url: siteurl,
-  logo: `${siteurl}/android_chrome_x144.png`,
+  logo: `${siteurl}/icons/android_x144.png`,
   name: sitename,
   image: [`${siteurl}/images/couverture.png`],
   priceRange: "€€€",

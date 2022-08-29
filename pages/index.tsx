@@ -43,7 +43,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
     }, 11000)
 
     return () => clearTimeout(id)
-  })
+  }, [])
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_PWA_ENABLED) {
