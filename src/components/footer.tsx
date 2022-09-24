@@ -1,5 +1,5 @@
 import { Container, Nav } from "react-bootstrap"
-import { email, fbId, raoLink, sitename, telephone } from "@libs/app"
+import { email, raoLink /* ,fbId,  sitename, telephone */ } from "@libs/app"
 import { useFacebookURL } from "@libs/hooks"
 import Link from "next/link"
 
@@ -11,7 +11,7 @@ const Footer = () => {
       <Container className="conthrax pt-130 pb-5">
         <h2 className="h1 mb-0">TEVA</h2>
         <hr className="border border-2 border-primary opacity-100" />
-        <a href={`tel:${telephone}`}>{telephone}</a>
+        {/* <a href={`tel:${telephone}`}>{telephone}</a>
         <div>
           <a href={fb_url} target={fb_url.match("fb://") ? "" : "_blank"} rel="noopener noreferrer">
             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-facebook" viewBox="0 0 16 16">
@@ -19,7 +19,7 @@ const Footer = () => {
             </svg>
             <span className="ms-2">{sitename}</span>
           </a>
-        </div>
+        </div> */}
         <div>
           <a href={`mailto:${email}`}>{email}</a>
         </div>
