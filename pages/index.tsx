@@ -5,8 +5,9 @@ import { description, fbAppId, sitename, siteurl } from "@libs/app"
 import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
 import BillLayout from "@components/home/bills"
-import { getPrices, getServices } from "@libs/firebase"
-import { exploitableServicesData, exploitablePricesData, logger } from "@libs/helpers"
+import AdLayout from "@components/home/ad"
+import { getAd, getPrices, getServices } from "@libs/firebase"
+import { exploitableServicesData, exploitablePricesData, exploitableAdData, logger } from "@libs/helpers"
 import CookieConsent from "react-cookie-consent"
 
 import type { InferGetStaticPropsType, NextPage } from "next"
@@ -91,6 +92,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
         <meta property="og:image:type" content="image/png" />
         <script type="application/ld+json">{JSON.stringify(Organization)}</script>
       </Head>
+      <AdLayout ad={props.ad} />
       <MainLayout />
       <ServiceLayout services={props.services} />
       <BillLayout prices={props.prices} />
@@ -105,11 +107,11 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
 
 export const getStaticProps = async () => {
   try {
-    const [services, prices] = await Promise.all([getServices(), getPrices()])
-    return { props: { services: exploitableServicesData(services), prices: exploitablePricesData(prices) }, revalidate: 60 }
+    const [services, prices, ad] = await Promise.all([getServices(), getPrices(), getAd()])
+    return { props: { services: exploitableServicesData(services), prices: exploitablePricesData(prices), ad: exploitableAdData(ad) }, revalidate: 60 }
   } catch (error) {
     logger("err", error)
-    return { props: { services: null, prices: null }, revalidate: 60 }
+    return { props: { services: null, prices: null, ad: null }, revalidate: 60 }
   }
 }
 

@@ -62,6 +62,11 @@ const Navs = () => {
               Devis/Factures
             </Nav.Link>
           </Nav.Item>
+          <Nav.Item as="li">
+            <Nav.Link href="#ad" onClick={() => handleClick(RouteField.AD)} className="py-3">
+              Annonce
+            </Nav.Link>
+          </Nav.Item>
         </>
       )}
     </>

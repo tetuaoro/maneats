@@ -1,25 +1,13 @@
 import { Container, Nav } from "react-bootstrap"
-import { email, raoLink /* ,fbId,  sitename, telephone */ } from "@libs/app"
-import { useFacebookURL } from "@libs/hooks"
+import { email, raoLink } from "@libs/app"
 import Link from "next/link"
 
 const Footer = () => {
-  const [fb_url] = useFacebookURL()
-
   return (
     <footer className="bg-dark border-top border-primary border-5 text-white">
       <Container className="conthrax pt-130 pb-5">
         <h2 className="h1 mb-0">TEVA</h2>
         <hr className="border border-2 border-primary opacity-100" />
-        {/* <a href={`tel:${telephone}`}>{telephone}</a>
-        <div>
-          <a href={fb_url} target={fb_url.match("fb://") ? "" : "_blank"} rel="noopener noreferrer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" className="bi bi-facebook" viewBox="0 0 16 16">
-              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
-            </svg>
-            <span className="ms-2">{sitename}</span>
-          </a>
-        </div> */}
         <div>
           <a href={`mailto:${email}`}>{email}</a>
         </div>

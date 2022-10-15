@@ -85,11 +85,19 @@ export interface BillCounter {
   counter: number
 }
 
+export interface AnnouncementData {
+  id?: string
+  title: string
+  message: string
+  updatedAt?: Timestamp
+}
+
 export const ACCOUNT_REF = "account"
 export const SERVICES_REF = "services"
 export const PRICES_REF = "prices"
 export const BILLS_REF = "bills"
 export const COUNTER_REF = "counter"
+export const ANNOUNCEMENT_REF = "announcement"
 
 /* ACCOUNT */
 
@@ -287,7 +295,7 @@ export const getBills = async () => {
 export const getBill = async (id: string) => {
   try {
     const _doc = await getDoc(doc(db, BILLS_REF, id))
-    if (!_doc.exists()) throw new Error("bill no exist !")
+    if (!_doc.exists()) throw new Error("bill not exist !")
     return _doc.data() as BillData
   } catch (error) {
     throw error
@@ -326,6 +334,28 @@ export const getBillPhoneCounter = async (phone: string) => {
     const q = query(collection(db, BILLS_REF), where("phone", "==", phone))
     const docsSnap = await getDocs(q)
     return docsSnap.empty ? 0 : docsSnap.size
+  } catch (error) {
+    throw error
+  }
+}
+
+/* ANNOUNCEMENT */
+
+const adID = "QgUw5KNLMtUviRxovIbL"
+export const getAd = async () => {
+  try {
+    const _doc = await getDoc(doc(db, ANNOUNCEMENT_REF, adID))
+    if (!_doc.exists()) throw new Error("Ad not exist !")
+    return _doc.data() as AnnouncementData
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateAd = async (data: AnnouncementData) => {
+  try {
+    data = { ...data, updatedAt: Timestamp.now() }
+    await updateDoc(doc(db, ANNOUNCEMENT_REF, adID), { ...data })
   } catch (error) {
     throw error
   }

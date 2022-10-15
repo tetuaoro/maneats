@@ -1,11 +1,11 @@
-import { onAuthStateChanged, getAccount, getServices, getPrices, getBills } from "./firebase"
+import { onAuthStateChanged, getAccount, getServices, getPrices, getBills, getAd } from "./firebase"
 import { atom, selector } from "recoil"
-import { Login, Account, Services, Prices, Bills } from "@components/dashboard/layouts"
+import { Login, Account, Services, Prices, Bills, Annoucement } from "@components/dashboard/layouts"
 import { logger } from "./helpers"
 
 import type { ComponentType } from "react"
 import type { User } from "firebase/auth"
-import type { AccountData, ServiceData, PriceData, BillData } from "./firebase"
+import type { AccountData, ServiceData, PriceData, BillData, AnnouncementData } from "./firebase"
 
 /* AUTHENTICATION WITH FIREBASE */
 
@@ -40,6 +40,31 @@ export const accountState = selector<AccountData | null>({
       logger("err", error)
       return null
     }
+  },
+})
+
+/* ANNOUNCEMENT DATA WITH FIREBASE */
+
+const proxyAdState = atom<AnnouncementData | null>({
+  key: "proxy-ad-atom-state",
+  default: null,
+})
+
+export const adState = selector<AnnouncementData | null>({
+  key: "ad-selector-state",
+  get: async ({ get }) => {
+    try {
+      if (!get(authState)) return null
+      const ad = get(proxyAdState)
+      if (ad) return ad
+      return await getAd()
+    } catch (error) {
+      logger("err", error)
+      return null
+    }
+  },
+  set: ({ get, set }, newState) => {
+    if (get(authState)) set(proxyAdState, newState)
   },
 })
 
@@ -120,7 +145,7 @@ export const billsState = selector<BillData[] | null>({
 
 /* ROUTES & COMPONENTS */
 
-export type RouteType = "Account" | "Login" | "Services" | "Prices" | "Bills"
+export type RouteType = "Account" | "Login" | "Services" | "Prices" | "Bills" | "Ad"
 type JSXElementType = () => JSX.Element
 
 type RouteFieldType = {
@@ -129,6 +154,7 @@ type RouteFieldType = {
   SERVICES: RouteType
   PRICES: RouteType
   BILLS: RouteType
+  AD: RouteType
 }
 export const RouteField: RouteFieldType = {
   ACCOUNT: "Account",
@@ -136,6 +162,7 @@ export const RouteField: RouteFieldType = {
   SERVICES: "Services",
   PRICES: "Prices",
   BILLS: "Bills",
+  AD: "Ad",
 }
 
 export const routeState = atom<RouteType | null>({
@@ -156,6 +183,8 @@ export const componentState = selector<JSXElementType | ComponentType<{}>>({
         return Prices
       case "Bills":
         return Bills
+      case "Ad":
+        return Annoucement
       default:
         return Account
     }
