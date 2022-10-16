@@ -9,3 +9,19 @@
 .transition03 {
   transition: all 0.3s ease 0s;
 }
+
+.cover {
+  height: 130px;
+}
+
+@media (min-width: 576px) {
+  .cover {
+    height: 170px;
+  }
+}
+
+@media (min-width: 768px) {
+  .cover {
+    height: 271px;
+  }
+}

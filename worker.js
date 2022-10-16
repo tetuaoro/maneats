@@ -1,7 +1,6 @@
-import { NetworkFirst /* , CacheFirst */ } from "workbox-strategies"
+import { NetworkFirst } from "workbox-strategies"
 import { CacheableResponsePlugin } from "workbox-cacheable-response"
-// import { ExpirationPlugin } from "workbox-expiration"
-import { registerRoute, NavigationRoute /* , Route */ } from "workbox-routing"
+import { registerRoute, NavigationRoute } from "workbox-routing"
 import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching"
 import { offlineFallback } from "workbox-recipes"
 
@@ -22,12 +21,6 @@ const cacheableOk = new CacheableResponsePlugin({
   statuses: [0, 200],
 })
 
-// const expiration = new ExpirationPlugin({
-//   maxEntries: 50,
-//   maxAgeSeconds: 60 * 60 * 24 * 7 /* 1 week */,
-//   purgeOnQuotaError: true,
-// })
-
 const navigationRoute = new NavigationRoute(
   new NetworkFirst({
     cacheName: "navigations",
@@ -35,18 +28,6 @@ const navigationRoute = new NavigationRoute(
   })
 )
 
-// const assetRoute = new Route(
-//   ({ request }) => {
-//     const { destination: dst } = request
-//     return dst.match("image|style|script|font")
-//   },
-//   new CacheFirst({
-//     cacheName: "assets",
-//     plugins: [expiration, cacheableOk],
-//   })
-// )
-
 registerRoute(navigationRoute)
-// registerRoute(assetRoute)
 
 offlineFallback({ pageFallback: "/offline" })
