@@ -109,7 +109,7 @@ const Component = () => {
       if (!id) throw new Error("Pas d'identifiant !")
       const text: string = e.target.innerText
       const key: string = e.target.id
-      if (text.length < 5) throw new Error("Doit contenir au moins 5 lettres !")
+      // if (text.length < 5) throw new Error("Doit contenir au moins 5 lettres !")
       const data = { [key]: text }
       await updateService(data, id)
       document.querySelectorAll("[contenteditable='false']").forEach((e) => e.setAttribute("contenteditable", "true"))

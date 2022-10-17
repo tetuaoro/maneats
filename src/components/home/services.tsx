@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Col, Row } from "react-bootstrap"
+import { Col, Row, Card } from "react-bootstrap"
 import { exploitableServicesData } from "@libs/helpers"
 import { useTransition } from "@libs/hooks"
 
@@ -22,18 +22,16 @@ const Component = (props: Props) => {
       <p className="text-indent">{"Nous nous déplaçons, à votre demande, et ce afin de vous faciliter la vie en vous proposant nos divers services :"}</p>
 
       <section className="py-3 py-sm-5">
-        {services?.map((service, k) => (
+        {services?.map(({ description, image: { src, filename, width, height }, name }, k) => (
           <Row key={k} className="pt-3 pt-sm-5">
-            <Col className={`${k % 2 === 0 ? "" : "order-sm-2"}`}>
-              <Image className={`img-observer ${styles.transition_opacity_y_scale}`} src={service.image.src} alt={service.image.filename} width={service.image.width} height={service.image.height} />
-            </Col>
-            <Col sm={6}>
-              <article className="d-sm-flex flex-sm-column justify-content-sm-center h-100">
-                <h3 className={`h3-observer conthrax ${styles.transition_opacity_y_translateX}`} id={service.name.replaceAll(" ", "").toLowerCase()}>
-                  <a href={`#${service.name.replaceAll(" ", "").toLowerCase()}`}>- {service.name}</a>
-                </h3>
-                <p>{service.description}</p>
-              </article>
+            <Col>
+              <Card className="border-0">
+                <Card.Img as={Image} src={src} alt={filename} width={width} height={height} />
+                <Card.ImgOverlay className={styles.imgAfter}>
+                  <Card.Title className="fs-1">{name}</Card.Title>
+                  <Card.Text className="fs-3">{description}</Card.Text>
+                </Card.ImgOverlay>
+              </Card>
             </Col>
           </Row>
         ))}

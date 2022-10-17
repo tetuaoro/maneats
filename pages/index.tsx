@@ -6,6 +6,7 @@ import Organization from "@libs/schema"
 import ServiceLayout from "@components/home/services"
 import BillLayout from "@components/home/bills"
 import AdLayout from "@components/home/ad"
+import Gallery from "@components/home/gallery"
 import { getAd, getPrices, getServices } from "@libs/firebase"
 import { exploitableServicesData, exploitablePricesData, exploitableAdData, logger } from "@libs/helpers"
 import CookieConsent from "react-cookie-consent"
@@ -96,6 +97,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
       <MainLayout />
       <ServiceLayout services={props.services} />
       <BillLayout prices={props.prices} />
+      <Gallery />
       {showCookies && (
         <CookieConsent expires={180} cookieName="acceptcgu" buttonText="Bien sûr" buttonStyle={{ color: "white", backgroundColor: "var(--bs-primary)" }}>
           {"En poursuivant votre navigation, vous acceptez les conditions d'utilisation."}
