@@ -75,7 +75,7 @@ const Navs = () => {
 
 const Navigation = () => {
   return (
-    <Navbar sticky="top" bg="dark" variant="dark" expand="sm" collapseOnSelect className="align-items-sm-start">
+    <Navbar sticky="top" bg="dark" variant="dark" expand="sm" collapseOnSelect className={"align-items-sm-start " + styles.vh100}>
       <Container fluid className="flex-sm-column">
         <Link href="/">
           <Navbar.Brand href="/" className="mb-sm-5">

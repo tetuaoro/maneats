@@ -6,7 +6,7 @@ import { modalState, servicesState } from "@libs/atoms"
 import { logger } from "@libs/helpers"
 import EmbedLayout from "@components/dashboard/layouts"
 
-import type { KeyboardEvent } from "react"
+import type { KeyboardEvent, ReactEventHandler } from "react"
 import type { Image, ServiceData } from "@libs/firebase"
 
 import styles from "@styles/Services.module.scss"
@@ -120,6 +120,11 @@ const Component = () => {
     }
   }
 
+  const onErrorCapture: ReactEventHandler<HTMLImageElement> = (e) => {
+    const img = e.target as HTMLImageElement
+    img.src = "/images/delivery_tahiti.png"
+  }
+
   return (
     <EmbedLayout>
       <h1>Services</h1>
@@ -130,7 +135,7 @@ const Component = () => {
         <Row xs={1} sm={2} md={3} className="g-4 pt-5">
           {services.map((service, k) => (
             <Col key={k}>
-              <Card className="shadow">
+              <Card className="h-100 shadow">
                 <label className={styles.cardLabelForm} htmlFor={`for-card-img-${k}`}>
                   <NextImage className={`card-img-top ${styles.cardImgForm}`} alt={service.name} width={service.image.width} height={service.image.height} src={service.image.src} />
                 </label>

@@ -24,6 +24,13 @@ const config = {
   display: "standalone",
   shortcuts: [
     {
+      name: "Se connecter",
+      short_name: "Connexion",
+      description: "Gérer le site web depuis la page de gestion.",
+      url: "/dashboard",
+      icons: [{ src: "/icons/person-circle.png", sizes: "192x192", type: "image/png" }],
+    },
+    {
       name: "Demander un devis",
       short_name: "Devis",
       description: "Réaliser un devis afin d'estimer la facture finale.",

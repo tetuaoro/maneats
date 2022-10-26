@@ -23,3 +23,9 @@ $primary: #d4262f;
   align-items: center;
   justify-content: center;
 }
+
+@media (min-width: 576px) {
+  .vh100 {
+    height: 100vh;
+  }
+}
