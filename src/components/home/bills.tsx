@@ -25,7 +25,7 @@ const FormLayout = ({ prices }: Props) => {
 
       let total = 0
       const refs: BillDataRefType[] = []
-      inputs.forEach((input) => {
+      /* inputs.forEach((input) => {
         try {
           if (input.type === "checkbox" && input.id.startsWith(checkboxId) && input.checked) {
             const id = input.id.substring(checkboxId.length)
@@ -49,7 +49,7 @@ const FormLayout = ({ prices }: Props) => {
         } catch (error) {
           refs.splice(0, refs.length)
         }
-      })
+      }) */
 
       if (refs.length === 0) throw new Error("Vous devez sélectioner au moins un service !")
 
@@ -67,7 +67,7 @@ const FormLayout = ({ prices }: Props) => {
         total,
       }
 
-      return inc ? await _addBill(data): data
+      return inc ? await _addBill(data) : data
     } catch (error) {
       setError(error instanceof Error ? error.message : "Une erreur est survenue ! [8907]")
       throw error
@@ -85,6 +85,7 @@ const FormLayout = ({ prices }: Props) => {
       const email = (document.querySelector("[name='email']") as HTMLInputElement)?.value
       if (!email) throw new Error("L'email est requis !")
       const { submitter } = e.nativeEvent as any
+      /* `sendbill` check if it is a true request for a delivery or not  */
       const sendbill = submitter.id === "send-bill"
       const bill = await addBill(sendbill)
       const { status } = await fetch("/api/sendmail", {
@@ -111,8 +112,134 @@ const FormLayout = ({ prices }: Props) => {
 
   return (
     <Form noValidate validated={validated} onSubmit={handleForm}>
+      <Coordonnees />
+      <Details />
+
+      <div className="mt-4">
+        <Form.Text>{"Nous collectons ces données afin de vous adresser par courriel le devis que vous avez sollicité."}</Form.Text>
+        <Form.Check required label={"J'accepte de partager mes informations confidentielles"} id={"emailok"} className="mb-3" type="checkbox" />
+
+        <Button className="me-3 mb-2" variant="dark" type="submit">
+          Recevoir uniquement le devis estimé
+        </Button>
+        <Button className="me-3 mb-2" id="send-bill" type="submit">
+          Soumettre le devis
+        </Button>
+
+        {error.length > 0 && (
+          <Alert className="d-block mb-2" variant="danger">
+            {error}
+          </Alert>
+        )}
+
+        {message.length > 0 && (
+          <Alert className="d-block mb-2" variant="success">
+            {message}
+          </Alert>
+        )}
+
+        <Form.Text muted className="d-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="me-1 bi bi-info-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+          </svg>
+          {"Recevoir le devis estimé n'est pas une demande pour nos services. Si vous voulez qu'on vous sert réelement, il faut soumettre le devis."}
+        </Form.Text>
+      </div>
+    </Form>
+  )
+}
+
+type Item = {
+  departure?: string
+  arrival?: string
+  package?: string
+  quantity?: string
+  comment?: string
+}
+
+const Details = () => {
+  const [items, setItems] = useState<Item[]>([])
+
+  const addItem = () => {
+    setItems([
+      ...items,
+      {
+        departure: "departure",
+        arrival: "arrival",
+        package: "package",
+        quantity: "quantity",
+        comment: "comment",
+      },
+    ])
+  }
+
+  const removeItem = (k: number) => {
+    setItems(items.filter((_, index) => index != k))
+  }
+
+  return (
+    <>
       <div className={`d-flex align-items-center ${styles.gap}`}>
-        <span>Coordonnées</span> <hr className="w-100" />
+        <span className="text-primary fs-4">Détails des courses</span> <hr className="w-100" />
+      </div>
+
+      <p className="my-3">
+        {
+          "Ajouter tous les colis à récupérer et recever le devis estimé dans votre boîte de messagerie. Préciser le plus possible les détails importants : numéro d'appartement, nom du magasin, bateau de Rangiroa, c'est le cousin qui récupère."
+        }
+      </p>
+
+      <div id="items">
+        {items.map((item, k) => (
+          <div key={k} className="mb-3 p-4 border border-2 rounded">
+            <div className="d-flex justify-content-between w-100">
+              <span>Course {k + 1}</span>
+              <span className="text-primary" onClick={() => removeItem(k)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
+                  <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                </svg>
+              </span>
+            </div>
+            <Row>
+              <Col>
+                <Form.Select className="mt-2" aria-label="lieu de ramassage">
+                  <option>Lieu de ramassage</option>
+                  <option value="1">Papeete centre</option>
+                  <option value="2">Punaauia ZI</option>
+                </Form.Select>
+              </Col>
+              <Col>
+                <Form.Select className="mt-2" aria-label="lieu de livraison">
+                  <option>Lieu de livraison</option>
+                  <option value="1">Papeete centre</option>
+                  <option value="2">Punaauia ZI</option>
+                </Form.Select>
+              </Col>
+            </Row>
+            <Form.Select className="mt-2" aria-label="nature du colis">
+              <option>Nature du colis</option>
+              <option value="1">Course alimentaire</option>
+              <option value="2">Transport animale</option>
+            </Form.Select>
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <Button onClick={addItem} variant="outline-primary" className="border-0">
+          Ajouter un colis
+        </Button>
+      </div>
+    </>
+  )
+}
+
+const Coordonnees = () => {
+  return (
+    <>
+      <div className={`d-flex align-items-center ${styles.gap}`}>
+        <span className="text-primary fs-4">Coordonnées</span> <hr className="w-100" />
       </div>
       <Form.Group className="mb-3" controlId="fullname">
         <Form.Label className={`d-flex align-items-center ${styles.gap}`}>
@@ -146,20 +273,11 @@ const FormLayout = ({ prices }: Props) => {
           />
         </InputGroup>
       </Form.Group>
-
-      <div className={`d-flex align-items-center ${styles.gap}`}>
-        <span>Détails</span> <hr className="w-100" />
-      </div>
-      <div ref={pricesRef}>
-        <FormPrices prices={prices} />
-      </div>
-
-      <div className={`d-flex align-items-center ${styles.gap}`}>
-        <span>Commentaire</span> <hr className="w-100" />
-      </div>
-      <Form.Control as="textarea" name="comment" className="mb-3" rows={3} />
       <Form.Group className="mb-3" controlId="email">
         <Form.Label className={`d-flex align-items-center ${styles.gap}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-envelope-fill" viewBox="0 0 16 16">
+            <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z" />
+          </svg>
           <span>Email</span>
         </Form.Label>
         <InputGroup>
@@ -171,81 +289,6 @@ const FormLayout = ({ prices }: Props) => {
           <Form.Control aria-label={"ex : " + `${email}`} aria-describedby="basic-addon2" name="email" type="email" placeholder={"ex : " + `${email}`} required />
         </InputGroup>
       </Form.Group>
-      <Form.Text>{"Nous collectons ces données afin de vous adresser par courriel le devis que vous avez sollicité."}</Form.Text>
-      <Form.Check required label={"J'accepte de partager mes informations confidentielles"} id={"emailok"} className="mb-3" type="checkbox" />
-      <Button className="me-3 mb-2" variant="dark" type="submit">
-        Recevoir uniquement le devis estimé
-      </Button>
-      <Button className="me-3 mb-2" id="send-bill" type="submit">
-        Soumettre le devis
-      </Button>
-
-      {error.length > 0 && (
-        <Alert className="d-block mb-2" variant="danger">
-          {error}
-        </Alert>
-      )}
-
-      {message.length > 0 && (
-        <Alert className="d-block mb-2" variant="success">
-          {message}
-        </Alert>
-      )}
-
-      <Form.Text muted className="d-block">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="me-1 bi bi-info-circle" viewBox="0 0 16 16">
-          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-        </svg>
-        {"Recevoir le devis estimé n'est pas une demande pour nos services. Si vous voulez qu'on vous sert réelement, il faut soumettre le devis."}
-      </Form.Text>
-    </Form>
-  )
-}
-
-type PropsFormPrice = {
-  price: PriceData
-}
-
-const checkboxId = "checkbox-"
-const extrapriceId = "extraprice-"
-
-const FormPrice = ({ price }: PropsFormPrice) => {
-  const [checked, setChecked] = useState(false)
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked)
-
-  return (
-    <>
-      <Form.Check label={price.description} id={`${checkboxId}${price.id}`} onChange={onChange} className="mb-3" type="checkbox" />
-      {checked && price.extraPrice > 0 ? (
-        <FloatingLabel label="Quantité">
-          <Form.Control placeholder="90" id={`${extrapriceId}${price.id}`} type="number" min={1} defaultValue={1} required />
-        </FloatingLabel>
-      ) : (
-        ""
-      )}
-    </>
-  )
-}
-
-const FormPrices = ({ prices }: Props) => {
-  const groups: PriceData[][] = Object.values(
-    (prices as any[]).reduce((acc, x) => {
-      acc[x.group] = [...(acc[x.group] || []), x]
-      return acc
-    }, {})
-  )
-
-  return (
-    <>
-      {groups.map((group, k1) => (
-        <div key={k1}>
-          <div className="text-decoration-underline">{group[0].group.replace(/^\d+(\W|)/, "")}</div>
-          {group.map((price, k2) => (
-            <FormPrice key={k2} price={price} />
-          ))}
-        </div>
-      ))}
     </>
   )
 }
@@ -257,7 +300,7 @@ const Component = ({ prices }: Props) => {
   return (
     <>
       <h2 id="devis" className="conthrax">
-        <a href="#devis">Demander mon devis</a>
+        <a href="#devis">Estimer mon devis</a>
       </h2>
 
       <section className="py-3 py-sm-5">

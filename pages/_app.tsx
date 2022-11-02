@@ -2,6 +2,7 @@ import "@styles/globals.scss"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { RecoilRoot } from "recoil"
+import { FacebookProvider } from "react-facebook"
 
 import Header from "@components/header"
 import Footer from "@components/footer"
@@ -43,7 +44,9 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
       {!isEmbed && <Header />}
-      <Component {...pageProps} />
+      <FacebookProvider appId={fbAppId} lazy>
+        <Component {...pageProps} />
+      </FacebookProvider>
       {!isEmbed && <Footer />}
     </RecoilRoot>
   )
