@@ -27,7 +27,7 @@ const Component = (props: Props) => {
             <Col>
               <Card className="border-0">
                 <Card.Img as={Image} src={src} alt={filename} width={width} height={height} />
-                <Card.ImgOverlay className={styles.imgAfter}>
+                <Card.ImgOverlay className={name.length > 0 || description.length > 0 ? styles.imgAfter : ""}>
                   <Card.Title className="fs-1">{name}</Card.Title>
                   <Card.Text className="fs-3">{description}</Card.Text>
                 </Card.ImgOverlay>
