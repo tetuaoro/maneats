@@ -72,6 +72,7 @@ html,
 body {
   padding: 0;
   margin: 0;
+  background-color: rgba(250, 250, 250, 0.3);
 }
 
 h2 > a:hover::after,
@@ -84,6 +85,16 @@ h2 > a,
 h3 > a {
   color: inherit;
   text-decoration: inherit;
+}
+
+h2.conthrax {
+  margin-top: 6rem;
+}
+
+@media (min-width: 576px) {
+  h2.conthrax {
+    margin-top: 10rem;
+  }
 }
 
 /* FOOTER */

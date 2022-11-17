@@ -6,7 +6,11 @@ const Footer = () => {
   return (
     <footer className="bg-dark border-top border-primary border-5 text-white">
       <Container className="conthrax pt-130 pb-5">
-        <h2 className="h1 mb-0">TEVA</h2>
+        <h2 className="h1 mb-0">
+          <Link href="/dashboard">
+            <a>TEVA</a>
+          </Link>
+        </h2>
         <hr className="border border-2 border-primary opacity-100" />
         <div>
           <a href={`mailto:${email}`}>{email}</a>

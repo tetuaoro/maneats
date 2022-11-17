@@ -9,6 +9,8 @@ import type { PriceData, BillDataRefType, BillData } from "@libs/firebase"
 
 import styles from "@styles/Bills.module.scss"
 
+import Formik from "@components/forms"
+
 const FormLayout = ({ prices }: Props) => {
   const pricesRef = useRef<HTMLDivElement | null>(null)
   const [validated, setValidated] = useState(false)
@@ -204,9 +206,8 @@ const Details = () => {
             <Row>
               <Col>
                 <Form.Select className="mt-2" aria-label="lieu de ramassage">
-                  <option>Lieu de ramassage</option>
-                  <option value="1">Papeete centre</option>
-                  <option value="2">Punaauia ZI</option>
+                  <option>Lieu de récupération</option>
+                  <SelectOptions />
                 </Form.Select>
               </Col>
               <Col>
@@ -231,6 +232,15 @@ const Details = () => {
           Ajouter un colis
         </Button>
       </div>
+    </>
+  )
+}
+
+const SelectOptions = () => {
+  return (
+    <>
+      <option value="1">Papeete centre</option>
+      <option value="2">Punaauia ZI</option>
     </>
   )
 }
@@ -306,7 +316,8 @@ const Component = ({ prices }: Props) => {
       <section className="py-3 py-sm-5">
         <Row>
           <Col md={8} className="order-1">
-            <FormLayout prices={prices} />
+            {/* <FormLayout prices={prices} /> */}
+            <Formik />
           </Col>
           <Col className="order-0"></Col>
           <Col className="order-2"></Col>
