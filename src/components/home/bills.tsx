@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Form, InputGroup, FloatingLabel, Button, Row, Col, Alert } from "react-bootstrap"
 import { addBill as _addBill } from "@libs/firebase"
 import { exploitablePricesData, logger, parseIntWithThrow } from "@libs/helpers"
@@ -307,6 +307,8 @@ type Props = {
   prices: ReturnType<typeof exploitablePricesData> | null
 }
 const Component = ({ prices }: Props) => {
+  useEffect(() => console.log("prices from server", prices), [])
+
   return (
     <>
       <h2 id="devis" className="conthrax">

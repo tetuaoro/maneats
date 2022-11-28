@@ -91,7 +91,7 @@ const Page: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
         <meta property="og:image:width" content="720" />
         <meta property="og:image:height" content="482" />
         <meta property="og:image:type" content="image/png" />
-        <script type="application/ld+json">{JSON.stringify(Organization)}</script>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(Organization) }} />
       </Head>
       <AdLayout ad={props.ad} />
       <MainLayout />
